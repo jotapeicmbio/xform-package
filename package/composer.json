@@ -8,8 +8,11 @@
     ],
     "autoload": {
         "psr-4": {
-            "Icmbio\\Xform\\": "src/"
+            "Icmbio\\Xform\\": "src/",
+            "Icmbio\\Xform\\Tests\\": "tests/"
         }
     },
-    "require": {}
+    "require-dev": {
+        "phpunit/phpunit": "^11.5"
+    }
 }
