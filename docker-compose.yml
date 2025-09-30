@@ -1,0 +1,13 @@
+services:
+  app:
+    image: dev_xform_package
+    container_name: dev_xform_package
+    build:
+      context: .
+      dockerfile: docker/package/Dockerfile
+      args:
+        - uid=${CUSTOM_HOST_UID}
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./package:/var/www/html

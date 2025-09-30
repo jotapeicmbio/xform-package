@@ -1,0 +1,15 @@
+{
+    "name": "icmbio/xform",
+    "authors": [
+        {
+            "name": "João Pedro Garcia",
+            "email": "joao.garcia.bolsista@icmbio.gov.br"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Icmbio\\Xform\\": "src/"
+        }
+    },
+    "require": {}
+}
