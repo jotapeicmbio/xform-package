@@ -12,7 +12,7 @@ package_for_packagist:
   stage: package
   image: composer:2.6
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
   cache:
     paths:
       - .composer-cache/
