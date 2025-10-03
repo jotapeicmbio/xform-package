@@ -25,9 +25,9 @@ package_for_packagist:
     - mkdir -p package-artifact
     
     # Copia conteúdo do package (sem arquivos de desenvolvimento)
-    - cp -r package/src package-artifact/
-    - cp package/composer.json package-artifact/
-    - cp package/composer.lock package-artifact/ 2>/dev/null || true
+    - cp -r src package-artifact/
+    - cp composer.json package-artifact/
+    - cp composer.lock package-artifact/ 2>/dev/null || true
     
     # Vai para o diretório do artefato e instala dependências de produção
     - cd package-artifact
