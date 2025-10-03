@@ -1,0 +1,62 @@
+# GitLab CI/CD Pipeline para Pacote Xform
+# Cria artefatos do diretório package em merge requests para develop
+
+stages:
+  - package
+
+variables:
+  COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.composer-cache"
+
+# Job para criar artefato do package para Packagist
+package_for_packagist:
+  stage: package
+  image: composer:2.6
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+  cache:
+    paths:
+      - .composer-cache/
+  before_script:
+    - apk add --no-cache git
+  script:
+    - echo "📦 Preparando artefato do pacote Xform para Packagist..."
+    
+    # Cria diretório limpo para o artefato
+    - mkdir -p package-artifact
+    
+    # Copia conteúdo do package (sem arquivos de desenvolvimento)
+    - cp -r package/src package-artifact/
+    - cp package/composer.json package-artifact/
+    - cp package/composer.lock package-artifact/ 2>/dev/null || true
+    
+    # Vai para o diretório do artefato e instala dependências de produção
+    - cd package-artifact
+    - composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs
+    
+    # Remove arquivos desnecessários
+    - rm -rf tests/ phpunit.xml .phpunit.cache/ || true
+    
+    # Cria arquivo de informações do build
+    - echo "🔖 Informações do Build" > BUILD_INFO.md
+    - echo "- **Commit:** \`$CI_COMMIT_SHA\`" >> BUILD_INFO.md
+    - echo "- **Merge Request:** #$CI_MERGE_REQUEST_IID" >> BUILD_INFO.md
+    - echo "- **Branch Destino:** \`$CI_MERGE_REQUEST_TARGET_BRANCH_NAME\`" >> BUILD_INFO.md
+    - echo "- **Data:** \`$(date)\`" >> BUILD_INFO.md
+    - echo "- **Pipeline:** $CI_PIPELINE_URL" >> BUILD_INFO.md
+    
+    # Lista conteúdo final
+    - echo "📋 Conteúdo do artefato:"
+    - find . -type f -name "*.php" -o -name "*.json" -o -name "*.md" | sort
+    
+  artifacts:
+    name: "xform-package-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - package-artifact/
+    exclude:
+      - package-artifact/.phpunit.cache/**/*
+      - package-artifact/tests/**/*
+      - package-artifact/phpunit.xml
+    expire_in: 30 days
+    when: on_success
+    reports:
+      dotenv: package-artifact/BUILD_INFO.md
