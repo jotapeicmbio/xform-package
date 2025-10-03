@@ -1,2 +1,3 @@
 package/vendor/
 package/composer.lock
+package/.phpunit.cache/
