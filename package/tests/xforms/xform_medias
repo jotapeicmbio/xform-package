@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Xform Medias</h:title>
+    <model>
+      <instance>
+        <xform_medias id="xform_medias" version="20250930">
+          <medias jr:template="">
+            <name_image/>
+            <name_audio/>
+            <name_video/>
+            <name_file/>
+          </medias>
+          <meta>
+            <instanceID/>
+          </meta>
+        </xform_medias>
+      </instance>
+      <bind nodeset="/xform_medias/medias/name_image" type="binary"/>
+      <bind nodeset="/xform_medias/medias/name_audio" type="binary"/>
+      <bind nodeset="/xform_medias/medias/name_video" type="binary"/>
+      <bind nodeset="/xform_medias/medias/name_file" type="binary"/>
+      <bind calculate="concat('uuid:', uuid())" nodeset="/xform_medias/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <group ref="/xform_medias/medias">
+      <label></label>
+      <repeat nodeset="/xform_medias/medias">
+        <upload mediatype="image/*" ref="/xform_medias/medias/name_image">
+          <label>Take a picture or upload an image file.</label>
+        </upload>
+        <upload mediatype="audio/*" ref="/xform_medias/medias/name_audio">
+          <label>Take an audio recording or upload an audio file.</label>
+        </upload>
+        <upload mediatype="video/*" ref="/xform_medias/medias/name_video">
+          <label>Take a video recording or upload a video file.</label>
+        </upload>
+        <upload mediatype="application/*" ref="/xform_medias/medias/name_file">
+          <label>Generic file input (txt, pdf, xls, xlsx, doc, docx, rtf, zip)</label>
+        </upload>
+      </repeat>
+    </group>
+  </h:body>
+</h:html>

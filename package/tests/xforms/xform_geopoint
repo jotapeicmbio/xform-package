@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Xform Geopoint</h:title>
+    <model>
+      <instance>
+        <xform_geopoint id="xform_geopoint" version="20250930">
+          <store_gps/>
+          <pipe/>
+          <border/>
+          <meta>
+            <instanceID/>
+          </meta>
+        </xform_geopoint>
+      </instance>
+      <bind nodeset="/xform_geopoint/store_gps" type="geopoint"/>
+      <bind nodeset="/xform_geopoint/pipe" type="geotrace"/>
+      <bind nodeset="/xform_geopoint/border" type="geoshape"/>
+      <bind calculate="concat('uuid:', uuid())" nodeset="/xform_geopoint/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <input ref="/xform_geopoint/store_gps">
+      <label>Collect the GPS coordinates of this store.</label>
+    </input>
+    <input ref="/xform_geopoint/pipe">
+      <label>Pipeline</label>
+    </input>
+    <input ref="/xform_geopoint/border">
+      <label>Border</label>
+    </input>
+  </h:body>
+</h:html>

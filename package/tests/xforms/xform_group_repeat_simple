@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Xform group repeat simple</h:title>
+    <model>
+      <instance>
+        <xlsform_group_repeat_simple id="xlsform_group_repeat_simple" version="20250930">
+          <first_group jr:template="">
+            <name/>
+            <uuid/>
+          </first_group>
+          <meta>
+            <instanceID/>
+          </meta>
+        </xlsform_group_repeat_simple>
+      </instance>
+      <bind nodeset="/xlsform_group_repeat_simple/first_group/name" type="string"/>
+      <bind nodeset="/xlsform_group_repeat_simple/first_group/uuid" type="string" calculate="uuid()"/>
+      <bind nodeset="/xlsform_group_repeat_simple/meta/instanceID"  type="string" calculate="concat('uuid:', uuid())" readonly="true()"/>
+    </model>
+  </h:head>
+  <h:body>
+    <group ref="/xlsform_group_repeat_simple/first_group">
+      <label></label>
+      <repeat nodeset="/xlsform_group_repeat_simple/first_group">
+        <input ref="/xlsform_group_repeat_simple/first_group/name">
+          <label>You name</label>
+        </input>
+      </repeat>
+    </group>
+  </h:body>
+</h:html>

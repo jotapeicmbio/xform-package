@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Xform group repeat simple</h:title>
+    <model>
+      <instance>
+        <xlsform_group_repeat_nested id="xlsform_group_repeat_nested" version="20250930">
+          <first_group jr:template="">
+            <first_name/>
+            <first_uuid/>
+            <second_group jr:template="">
+              <second_name/>
+              <second_uuid/>
+              <third_group jr:template="">
+                <thrid_name/>
+                <thrid_uuid/>
+              </third_group>
+            </second_group>
+          </first_group>
+          <meta>
+            <instanceID/>
+          </meta>
+        </xlsform_group_repeat_nested>
+      </instance>
+      <bind nodeset="/xlsform_group_repeat_nested/first_group/first_name" type="string"/>
+      <bind calculate="uuid()" nodeset="/xlsform_group_repeat_nested/first_group/first_uuid" type="string"/>
+      <bind nodeset="/xlsform_group_repeat_nested/first_group/second_group/second_name" type="string"/>
+      <bind calculate="uuid()" nodeset="/xlsform_group_repeat_nested/first_group/second_group/second_uuid" type="string"/>
+      <bind nodeset="/xlsform_group_repeat_nested/first_group/second_group/third_group/thrid_name" type="string"/>
+      <bind calculate="uuid()" nodeset="/xlsform_group_repeat_nested/first_group/second_group/third_group/thrid_uuid" type="string"/>
+      <bind calculate="concat('uuid:', uuid())" nodeset="/xlsform_group_repeat_nested/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <group ref="/xlsform_group_repeat_nested/first_group">
+      <label></label>
+      <repeat nodeset="/xlsform_group_repeat_nested/first_group">
+        <input ref="/xlsform_group_repeat_nested/first_group/first_name">
+          <label>First You name</label>
+        </input>
+        <group ref="/xlsform_group_repeat_nested/first_group/second_group">
+          <label></label>
+          <repeat nodeset="/xlsform_group_repeat_nested/first_group/second_group">
+            <input ref="/xlsform_group_repeat_nested/first_group/second_group/second_name">
+              <label>Second You name</label>
+            </input>
+            <group ref="/xlsform_group_repeat_nested/first_group/second_group/third_group">
+              <label></label>
+              <repeat nodeset="/xlsform_group_repeat_nested/first_group/second_group/third_group">
+                <input ref="/xlsform_group_repeat_nested/first_group/second_group/third_group/thrid_name">
+                  <label>Thrid You name</label>
+                </input>
+              </repeat>
+            </group>
+          </repeat>
+        </group>
+      </repeat>
+    </group>
+  </h:body>
+</h:html>
