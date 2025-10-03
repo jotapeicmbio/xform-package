@@ -10,4 +10,4 @@ services:
     tty: true
     stdin_open: true
     volumes:
-      - ./package:/var/www/html
+      - ./:/var/www/html
