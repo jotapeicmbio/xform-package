@@ -22,7 +22,7 @@ trait SurveyGroupRepeat
 
     public function getGroupRepeatsWithUuid(): array
     {
-        $nodes = $this->xpath()->query('//x:group[@repeat="true"]/@nodeset | //x:repeat/@nodeset');
+        $nodes = $this->xpath()->query('//x:bind[contains(@nodeset, "uuid")]/@nodeset');
         return array_map(fn($n) => $n->nodeValue, iterator_to_array($nodes));
     }
 }
