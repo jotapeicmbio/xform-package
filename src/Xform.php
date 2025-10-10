@@ -12,10 +12,13 @@ class Xform
         Concerns\SurveyGroupRepeat;
 
     private DOMDocument $domDocument;
+    protected ?string $group_repeat = null;
 
-    public function __construct(string $content)
+    public function __construct(string $content, ?string $group_repeat = null)
     {
+
         $this->domDocument = $this->loadToDom($content);
+        $this->group_repeat = $group_repeat;
     }
 
     public static function make(string $content): static

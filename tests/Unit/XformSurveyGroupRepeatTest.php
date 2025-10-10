@@ -55,11 +55,11 @@ class XformSurveyGroupRepeatTest extends TestCase
 
         
         $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_simple');
-        $this->assertEquals($expected, (new Xform($xform))->getGroupRepeatsWithUuid());
+        $this->assertEquals($expected, (new Xform($xform, 'group'))->getGroupRepeatsWithUuid());
     }
 
 
-    // #[Test]
+    #[Test]
     public function shouldReturnArrayWhenXformHasGroupRepeatNestedWithUuid(): void
     {
        $expected = [
@@ -69,6 +69,6 @@ class XformSurveyGroupRepeatTest extends TestCase
         ];
 
         $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_nested');
-        $this->assertEquals($expected, (new Xform($xform))->getGroupRepeats());
+        $this->assertEquals($expected, (new Xform($xform, 'group'))->getGroupRepeatsWithUuid());
     }
 }
