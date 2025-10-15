@@ -26,4 +26,10 @@ trait SurveyInstance
         $version = $this->xpath()->evaluate('string(//*[@version][parent::x:instance]/@version)');
         return $version !== '' ? $version : null;
     }
+
+    public function getNodeset(): ?array
+    {
+        $nodes = $this->xpath()->query('//x:bind/@nodeset');
+        return array_map(fn($n) => $n->nodeValue, iterator_to_array($nodes));
+    }
 }
