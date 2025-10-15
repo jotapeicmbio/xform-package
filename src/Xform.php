@@ -42,5 +42,21 @@ class Xform
         $xpath->registerNamespace('x', 'http://www.w3.org/2002/xforms');
         return $xpath;
     }
+
+    public function abbreviatedXpath(string $xpath): string
+    {
+        return preg_replace('#^/?[^/]+/#', '', $xpath);
+    }
+
+    public function __call($name, $arguments)
+    {
+        if (str_contains($name, 'short')) {
+            $method = str_replace('short', '', $name);
+            if (method_exists($this, $method)) {
+                $result = $this->$method();
+                return array_map(fn($n) => $this->abbreviatedXpath($n), $result);
+            }
+        }
+    }
 }
 
