@@ -16,7 +16,7 @@ class Xform
 
     public function __construct(string $content, ?string $group_repeat = null)
     {
-
+        $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
         $this->domDocument = $this->loadToDom($content);
         $this->group_repeat = $group_repeat;
     }
@@ -30,7 +30,7 @@ class Xform
     {
         $document = new DOMDocument();
         libxml_use_internal_errors(true);
-        $document->loadXML($content);
+        $document->loadXML($content, LIBXML_NOBLANKS | LIBXML_NOERROR | LIBXML_NOWARNING);
         libxml_clear_errors();
 
         return $document;
@@ -40,6 +40,7 @@ class Xform
     {
         $xpath = new DOMXPath($this->domDocument);
         $xpath->registerNamespace('x', 'http://www.w3.org/2002/xforms');
+        $xpath->registerNamespace('h', 'http://www.w3.org/1999/xhtml');
         return $xpath;
     }
 
