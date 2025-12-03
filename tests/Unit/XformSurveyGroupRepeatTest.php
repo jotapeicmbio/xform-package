@@ -71,4 +71,20 @@ class XformSurveyGroupRepeatTest extends TestCase
         $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_nested');
         $this->assertEquals($expected, (new Xform($xform, 'group'))->getGroupRepeatsWithUuid());
     }
+
+    #[Test]
+    public function shouldReturnArraWithNamesXform(): void
+    {
+        $expected = [
+            '/xlsform_group_repeat_nested/first_group',
+            '/xlsform_group_repeat_nested/first_group/first_name',
+            '/xlsform_group_repeat_nested/first_group/second_group',
+            '/xlsform_group_repeat_nested/first_group/second_group/second_name',
+            '/xlsform_group_repeat_nested/first_group/second_group/third_group',
+            '/xlsform_group_repeat_nested/first_group/second_group/third_group/thrid_name',
+        ];
+
+        $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_nested');
+        $this->assertEquals($expected, (new Xform($xform))->getNamesXform());
+    }
 }
