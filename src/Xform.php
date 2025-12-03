@@ -13,6 +13,7 @@ class Xform
 
     private DOMDocument $domDocument;
     protected ?string $group_repeat = null;
+    protected ?string $group_repeat_plural = null;
 
     public function __construct(string $content, ?string $group_repeat = null)
     {

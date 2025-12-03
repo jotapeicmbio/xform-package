@@ -22,7 +22,16 @@ trait SurveyGroupRepeat
 
     public function getSpecificGroupRepeats(): array
     {
-        $nodes = $this->xpath()->query("//x:repeat[contains(@nodeset, '{$this->group_repeat}')]/@nodeset");
+        $nodes = $this->xpath()->query("//x:repeat[
+            (
+                substring(@nodeset, string-length(@nodeset) - string-length('{$this->group_repeat}') + 1) = '{$this->group_repeat}'
+                or
+                substring(@nodeset, string-length(@nodeset) - string-length('{$this->group_repeat_plural}') + 1) = '{$this->group_repeat_plural}'
+            )
+            and not(contains(@nodeset, '/{$this->group_repeat}/'))
+            and not(contains(@nodeset, '/{$this->group_repeat_plural}/'))
+        ]/@nodeset
+        ");
         return array_map(fn($n) => $n->nodeValue, iterator_to_array($nodes));
     }
 
