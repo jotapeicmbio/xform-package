@@ -15,11 +15,12 @@ class Xform
     protected ?string $group_repeat = null;
     protected ?string $group_repeat_plural = null;
 
-    public function __construct(string $content, ?string $group_repeat = null)
+    public function __construct(string $content, ?string $group_repeat = null, ?string $group_repeat_plural = null)
     {
         $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
         $this->domDocument = $this->loadToDom($content);
         $this->group_repeat = $group_repeat;
+        $this->group_repeat_plural = $group_repeat_plural;
     }
 
     public static function make(string $content): static
