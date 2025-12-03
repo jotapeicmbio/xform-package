@@ -24,12 +24,12 @@ trait SurveyGroupRepeat
     {
         $nodes = $this->xpath()->query("//x:repeat[
             (
-                substring(@nodeset, string-length(@nodeset) - string-length('{$this->group_repeat}') + 1) = '{$this->group_repeat}'
+                substring(@nodeset, string-length(@nodeset) - string-length('registro') + 1) = 'registro'
                 or
-                substring(@nodeset, string-length(@nodeset) - string-length('{$this->group_repeat_plural}') + 1) = '{$this->group_repeat_plural}'
+                substring(@nodeset, string-length(@nodeset) - string-length('registros') + 1) = 'registros'
             )
-            and not(contains(@nodeset, '/{$this->group_repeat}/'))
-            and not(contains(@nodeset, '/{$this->group_repeat_plural}/'))
+            and not(contains(@nodeset, '/registro/'))
+            and not(contains(@nodeset, '/registros/'))
         ]/@nodeset
         ");
         return array_map(fn($n) => $n->nodeValue, iterator_to_array($nodes));
