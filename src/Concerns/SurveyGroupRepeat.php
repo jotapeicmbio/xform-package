@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Icmbio\Xform\Concerns;
 
 trait SurveyGroupRepeat
@@ -41,7 +43,12 @@ trait SurveyGroupRepeat
         return array_map(fn($n) => $n->nodeValue, iterator_to_array($nodes));
     }
 
-    public function getNamesXform()
+    /**
+     * Retorna todos os nomes/referências dos elementos XForm no body
+     * 
+     * @return array<string> Array com as referências dos elementos
+     */
+    public function getNamesXform(): array
     {
         $nodes = $this->xpath()->query("//h:body//*[self::x:input or self::x:select1 or self::x:select or self::x:group or self::x:repeat or self::x:upload]/@ref");
         return array_map(fn($n) => $n->nodeValue, iterator_to_array($nodes));

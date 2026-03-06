@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Icmbio\Xform;
 
 use DOMDocument;
@@ -51,7 +54,7 @@ class Xform
         return preg_replace('#^/?[^/]+/#', '', $xpath);
     }
 
-    public function __call($name, $arguments)
+    public function __call(string $name, array $arguments): mixed
     {
         if (str_contains($name, 'short')) {
             $method = str_replace('short', '', $name);
@@ -60,6 +63,8 @@ class Xform
                 return array_map(fn($n) => $this->abbreviatedXpath($n), $result);
             }
         }
+        
+        throw new \BadMethodCallException("Method {$name} does not exist");
     }
 }
 

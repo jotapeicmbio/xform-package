@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Icmbio\Xform\Concerns;
 
 trait SurveyInstance
@@ -27,13 +29,23 @@ trait SurveyInstance
         return $version !== '' ? $version : null;
     }
 
-    public function getNodeset(): ?array
+    /**
+     * Retorna array de nodesets dos elementos bind no XForm
+     * 
+     * @return array<string> Array de strings com os nodesets
+     */
+    public function getNodeset(): array
     {
         $nodes = $this->xpath()->query('//x:bind/@nodeset');
         return array_map(fn($n) => $n->nodeValue, iterator_to_array($nodes));
     }
 
-    public function getSimpleInfoSurvey(): ?array
+    /**
+     * Extrai informações básicas dos campos do formulário
+     * 
+     * @return array<array{name: string, label: ?string}> Array com informações dos campos
+     */
+    public function getSimpleInfoSurvey(): array
     {
         $fields = [];
 
