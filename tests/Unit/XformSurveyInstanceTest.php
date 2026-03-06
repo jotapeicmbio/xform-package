@@ -69,4 +69,54 @@ class XformSurveyInstanceTest extends TestCase
         $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_nested');
         $this->assertEquals($expected, (new Xform($xform))->shortGetNodeset());
     }
+
+    #[Test]
+    public function shouldReturnSurveyWithNameAndLabelWithoutGroup(): void
+    {
+        $expected = [
+            [
+                'name' => 'store_gps',
+                'label' => 'Collect the GPS coordinates of this store.',
+            ],
+
+            [
+                'name' => 'pipe',
+                'label' => 'Pipeline',
+            ],
+
+            [
+                'name' => 'border',
+                'label' => 'Border',
+            ]
+        ];
+
+        
+        $xform = file_get_contents('/var/www/html/tests/xforms/xform_geopoint');
+        $this->assertEquals($expected, (new Xform($xform))->getSimpleInfoSurvey());
+    }
+
+    #[Test]
+    public function shouldReturnSurveyWithNameAndLabelWithGroup(): void
+    {
+        $expected = [
+            [
+                'name' => 'first_name',
+                'label' => 'First You name',
+            ],
+
+            [
+                'name' => 'second_name',
+                'label' => 'Second You name',
+            ],
+
+            [
+                'name' => 'thrid_name',
+                'label' => 'Thrid You name',
+            ]
+        ];
+
+        
+        $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_nested');
+        $this->assertEquals($expected, (new Xform($xform))->getSimpleInfoSurvey());
+    }
 }

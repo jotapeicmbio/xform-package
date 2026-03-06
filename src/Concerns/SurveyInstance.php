@@ -32,4 +32,28 @@ trait SurveyInstance
         $nodes = $this->xpath()->query('//x:bind/@nodeset');
         return array_map(fn($n) => $n->nodeValue, iterator_to_array($nodes));
     }
+
+    public function getSimpleInfoSurvey(): ?array
+    {
+        $fields = [];
+
+        $nodes = $this->xpath()->query(
+            '//h:body//*[self::x:input or self::x:select1 or self::x:select or self::x:textarea]'
+        );
+
+        foreach ($nodes as $node) {
+            $ref = $node->getAttribute('ref');
+            $name = basename($ref);
+            
+            $labelNode = $this->xpath()->query('.//x:label', $node)->item(0);
+            $label = $labelNode ? trim($labelNode->textContent) : null;
+
+            $fields[] = [
+                'name' => $name,
+                'label' => $label,
+            ];
+        }
+
+        return $fields;
+    }
 }
