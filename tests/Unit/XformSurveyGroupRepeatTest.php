@@ -12,6 +12,7 @@ class XformSurveyGroupRepeatTest extends TestCase
     public function shouldReturnFalseWhenXformNotHasGroupRepeat(): void
     {
         $xform = file_get_contents('/var/www/html/tests/xforms/xform_geopoint');
+        $this->assertIsString($xform);
         $this->assertFalse((new Xform($xform))->hasGroupRepeat());
     }
 
@@ -19,6 +20,7 @@ class XformSurveyGroupRepeatTest extends TestCase
     public function shouldReturnTrueWhenXformHasGroupRepeat(): void
     {
         $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_simple');
+        $this->assertIsString($xform);
         $this->assertTrue((new Xform($xform))->hasGroupRepeat());
     }
 
@@ -30,6 +32,7 @@ class XformSurveyGroupRepeatTest extends TestCase
         ];
 
         $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_simple');
+        $this->assertIsString($xform);
         $this->assertEquals($expected, (new Xform($xform))->getGroupRepeats());
     }
 
@@ -43,6 +46,7 @@ class XformSurveyGroupRepeatTest extends TestCase
         ];
 
         $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_nested');
+        $this->assertIsString($xform);
         $this->assertEquals($expected, (new Xform($xform))->getGroupRepeats());
     }
 
@@ -55,6 +59,7 @@ class XformSurveyGroupRepeatTest extends TestCase
 
         
         $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_simple');
+        $this->assertIsString($xform);
         $this->assertEquals($expected, (new Xform($xform, 'group'))->getGroupRepeatsWithUuid());
     }
 
@@ -69,6 +74,7 @@ class XformSurveyGroupRepeatTest extends TestCase
         ];
 
         $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_nested');
+        $this->assertIsString($xform);
         $this->assertEquals($expected, (new Xform($xform, 'group'))->getGroupRepeatsWithUuid());
     }
 
@@ -85,6 +91,7 @@ class XformSurveyGroupRepeatTest extends TestCase
         ];
 
         $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_nested');
+        $this->assertIsString($xform);
         $this->assertEquals($expected, (new Xform($xform))->getNamesXform());
     }
 }

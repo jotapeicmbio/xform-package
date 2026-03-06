@@ -75,6 +75,20 @@ tests/
 - 📊 **Memory profiling**: Monitorar uso de memória
 - 📊 **XPath optimization**: Otimizar queries complexas
 
+## ⚙️ **Ambiente de Desenvolvimento**
+
+### **Docker Workflow**
+- 🐳 **Container obrigatório**: Todo desenvolvimento via Docker
+- 🐳 **Comandos automatizados**: Scripts wrapper para container
+- 🐳 **Isolamento**: Ambiente PHP 8.2+ padronizado
+- 🐳 **Dependências**: Composer e PHPUnit via container
+
+### **Scripts de Desenvolvimento**
+- `./test` - Executa PHPUnit via container Docker
+- `./composer` - Executa Composer via container Docker
+- `./php` - Executa PHP via container Docker
+- `docker-compose up` - Inicia serviços se necessário
+
 ## 🔄 **Workflow de Desenvolvimento**
 
 ### **TDD Obrigatório (Test-Driven Development)**
@@ -100,8 +114,8 @@ refactor: melhorar performance de XPath queries
 
 ### **Antes de Commit**
 - ✅ **TDD completo**: Red → Green → Refactor cumprido
-- ✅ Executar `composer test` (100% pass)
-- ✅ Verificar `composer phpstan` (se configurado)
+- ✅ Executar `./test` (100% pass)
+- ✅ Verificar `./composer phpstan` (se configurado)
 - ✅ Confirmar PSR-12 compliance
 - ✅ Atualizar documentação se necessário
 - ✅ **Coverage**: Funcionalidade nova tem teste correspondente
@@ -109,8 +123,9 @@ refactor: melhorar performance de XPath queries
 ## 🛡️ **Compatibilidade e Estabilidade**
 
 ### **PHP Versions**
-- 🔧 **Mínimo**: PHP 8.1+
-- 🔧 **Tested**: 8.1, 8.2, 8.3
+- 🔧 **Container**: PHP 8.2+ via Docker
+- 🔧 **Comandos**: Via scripts wrapper (`./test`, `./composer`, `./php`)
+- 🔧 **Tested**: 8.1, 8.2, 8.3 (container matrix)
 - 🔧 **CI/CD**: Testes em múltiplas versões
 
 ### **XForm Standards**

@@ -11,7 +11,8 @@ trait SurveyAttachment
      */
     public function hasAttachments(): bool
     {
-        return $this->xpath()->evaluate('boolean(//x:bind[@type="binary"])');
+        $result = $this->xpath()->evaluate('boolean(//x:bind[@type="binary"])');
+        return $result === true;
     }
 
     /**
@@ -22,6 +23,13 @@ trait SurveyAttachment
     public function getAttachments(): array
     {
         $nodes = $this->xpath()->query('//x:bind[@type="binary"]/@nodeset');
-        return array_map(fn($n) => $n->nodeValue, iterator_to_array($nodes));
+        if ($nodes === false) {
+            return [];
+        }
+        
+        return array_map(
+            fn($n) => (string) $n->nodeValue, 
+            iterator_to_array($nodes)
+        );
     }
 }

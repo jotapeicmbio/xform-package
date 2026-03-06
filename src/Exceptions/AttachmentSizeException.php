@@ -38,8 +38,8 @@ class AttachmentSizeException extends XformAttachmentException
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
         
-        $bytes /= (1 << (10 * $pow));
+        $bytes /= (1 << (10 * (int)$pow));
         
-        return number_format($bytes, 1) . ' ' . $units[$pow];
+        return number_format($bytes, 1) . ' ' . $units[(int)$pow];
     }
 }

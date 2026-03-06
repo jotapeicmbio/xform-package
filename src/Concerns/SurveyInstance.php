@@ -6,27 +6,44 @@ namespace Icmbio\Xform\Concerns;
 
 trait SurveyInstance
 {
+    /**
+     * Verifica se o formúlário possui ID definido
+     */
     public function hasId(): bool
     {
-        return $this->xpath()->evaluate('boolean(//*[@id][parent::x:instance])');
+        $result = $this->xpath()->evaluate('boolean(//*[@id][parent::x:instance])');
+        return $result === true;
     }
 
+    /**
+     * Retorna o ID do formulário se existir
+     */
     public function getId(): ?string
     {
-        return $this->hasId()
-            ? $this->xpath()->evaluate('string(//*[@id][parent::x:instance]/@id)')
-            : null;
+        if (!$this->hasId()) {
+            return null;
+        }
+        
+        $result = $this->xpath()->evaluate('string(//*[@id][parent::x:instance]/@id)');
+        return is_string($result) && $result !== '' ? $result : null;
     }
 
+    /**
+     * Verifica se o formulário possui versão definida
+     */
     public function hasVersion(): bool
     {
-        return $this->xpath()->evaluate('boolean(//*[@version][parent::x:instance])');
+        $result = $this->xpath()->evaluate('boolean(//*[@version][parent::x:instance])');
+        return $result === true;
     }
 
+    /**
+     * Retorna a versão do formulário se existir
+     */
     public function getVersion(): ?string
     {
-        $version = $this->xpath()->evaluate('string(//*[@version][parent::x:instance]/@version)');
-        return $version !== '' ? $version : null;
+        $result = $this->xpath()->evaluate('string(//*[@version][parent::x:instance]/@version)');
+        return is_string($result) && $result !== '' ? $result : null;
     }
 
     /**
@@ -37,7 +54,14 @@ trait SurveyInstance
     public function getNodeset(): array
     {
         $nodes = $this->xpath()->query('//x:bind/@nodeset');
-        return array_map(fn($n) => $n->nodeValue, iterator_to_array($nodes));
+        if ($nodes === false) {
+            return [];
+        }
+        
+        return array_map(
+            fn($n) => (string) $n->nodeValue, 
+            iterator_to_array($nodes)
+        );
     }
 
     /**
@@ -52,12 +76,17 @@ trait SurveyInstance
         $nodes = $this->xpath()->query(
             '//h:body//*[self::x:input or self::x:select1 or self::x:select or self::x:textarea]'
         );
+        
+        if ($nodes === false) {
+            return [];
+        }
 
         foreach ($nodes as $node) {
             $ref = $node->getAttribute('ref');
             $name = basename($ref);
             
-            $labelNode = $this->xpath()->query('.//x:label', $node)->item(0);
+            $labelQuery = $this->xpath()->query('.//x:label', $node);
+            $labelNode = $labelQuery !== false ? $labelQuery->item(0) : null;
             $label = $labelNode ? trim($labelNode->textContent) : null;
 
             $fields[] = [

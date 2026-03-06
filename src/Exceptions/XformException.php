@@ -12,8 +12,19 @@ use Throwable;
  */
 class XformException extends Exception
 {
+    /**
+     * @var array<string, mixed> Contextual information about the exception
+     */
     protected array $context = [];
 
+    /**
+     * Constructor
+     *
+     * @param string $message Exception message
+     * @param int $code Exception code
+     * @param Throwable|null $previous Previous exception
+     * @param array<string, mixed> $context Additional context information
+     */
     public function __construct(
         string $message = "", 
         int $code = 0, 

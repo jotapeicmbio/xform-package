@@ -12,7 +12,8 @@ trait SurveyOsm
      */
     public function hasOsm(): bool
     {
-        return $this->xpath()->evaluate('boolean(//x:bind[@type="osm"])');
+        $result = $this->xpath()->evaluate('boolean(//x:bind[@type="osm"])');
+        return $result === true;
     }
 
     /**
@@ -23,6 +24,13 @@ trait SurveyOsm
     public function getOsms(): array
     {
         $nodes = $this->xpath()->query('//x:bind[@type="osm"]/@nodeset');
-        return array_map(fn($n) => $n->nodeValue, iterator_to_array($nodes));
+        if ($nodes === false) {
+            return [];
+        }
+        
+        return array_map(
+            fn($n) => (string) $n->nodeValue, 
+            iterator_to_array($nodes)
+        );
     }
 }

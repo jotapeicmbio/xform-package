@@ -31,6 +31,7 @@ class XformParseExceptionTest extends TestCase
         
         $context = $exception->getContext();
         $this->assertArrayHasKey('xml_snippet', $context);
+        $this->assertIsString($context['xml_snippet']);
         $this->assertStringContainsString('<invalid>', $context['xml_snippet']);
     }
 
@@ -40,6 +41,7 @@ class XformParseExceptionTest extends TestCase
         $exception = InvalidXmlException::malformedXml($longXml);
         
         $context = $exception->getContext();
+        $this->assertIsString($context['xml_snippet']);
         $this->assertLessThanOrEqual(200, strlen($context['xml_snippet']));
     }
 

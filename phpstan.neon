@@ -1,0 +1,41 @@
+# PHPStan Configuration for ICMBio XForm Package
+# Level 9 (maximum) following project standards
+
+parameters:
+    level: 9
+    paths:
+        - src
+        - tests
+    
+    # Bootstrap for tests
+    bootstrapFiles:
+        - vendor/autoload.php
+    
+    # Exception classes that extend built-in exceptions
+    exceptions:
+        implicitThrows: false
+        checkedExceptionClasses:
+            - 'Icmbio\Xform\Exceptions\XformException'
+    
+    # Ignore patterns for generated files or vendor
+    ignoreErrors:
+        # DOMNodeList iteration typically returns DOMElements in our context
+        -
+            message: '#Call to an undefined method DOMNameSpaceNode\|DOMNode::getAttribute\(\)#'
+            path: src/Concerns/SurveyInstance.php
+        -
+            message: '#Parameter .* expects DOMNode\|null, DOMNameSpaceNode\|DOMNode given#'
+            path: src/Concerns/SurveyInstance.php
+        -
+            message: '#Access to an undefined property DOMNameSpaceNode\|DOMNode::\$textContent#'
+            path: src/Concerns/SurveyInstance.php
+        # SurveyOsm trait not used yet (planned feature) 
+        -
+            message: '#Trait.*SurveyOsm is used zero times#'
+            path: src/Concerns/SurveyOsm.php
+    
+    # Additional checks
+    checkUninitializedProperties: true
+    
+    # Type coverage
+    reportUnmatchedIgnoredErrors: true

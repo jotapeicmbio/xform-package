@@ -11,7 +11,8 @@ trait SurveyGeo
      */
     public function hasGeopoint(): bool
     {
-        return $this->xpath()->evaluate('boolean(//x:bind[@type="geopoint"])');
+        $result = $this->xpath()->evaluate('boolean(//x:bind[@type="geopoint"])');
+        return $result === true;
     }
 
     /**
@@ -19,7 +20,8 @@ trait SurveyGeo
      */
     public function hasGeotrace(): bool
     {
-        return $this->xpath()->evaluate('boolean(//x:bind[@type="geotrace"])');
+        $result = $this->xpath()->evaluate('boolean(//x:bind[@type="geotrace"])');
+        return $result === true;
     }
 
     /**
@@ -27,7 +29,8 @@ trait SurveyGeo
      */
     public function hasGeoshape(): bool
     {
-        return $this->xpath()->evaluate('boolean(//x:bind[@type="geoshape"])');
+        $result = $this->xpath()->evaluate('boolean(//x:bind[@type="geoshape"])');
+        return $result === true;
     }
 
     /**
@@ -38,7 +41,14 @@ trait SurveyGeo
     public function getGeopoints(): array
     {
         $nodes = $this->xpath()->query('//x:bind[@type="geopoint"]/@nodeset');
-        return array_map(fn($n) => $n->nodeValue, iterator_to_array($nodes));
+        if ($nodes === false) {
+            return [];
+        }
+        
+        return array_map(
+            fn($n) => (string) $n->nodeValue, 
+            iterator_to_array($nodes)
+        );
     }
 
     /**
@@ -49,7 +59,14 @@ trait SurveyGeo
     public function getGeotraces(): array
     {
         $nodes = $this->xpath()->query('//x:bind[@type="geotrace"]/@nodeset');
-        return array_map(fn($n) => $n->nodeValue, iterator_to_array($nodes));
+        if ($nodes === false) {
+            return [];
+        }
+        
+        return array_map(
+            fn($n) => (string) $n->nodeValue, 
+            iterator_to_array($nodes)
+        );
     }
 
     /**
@@ -60,6 +77,13 @@ trait SurveyGeo
     public function getGeoshapes(): array
     {
         $nodes = $this->xpath()->query('//x:bind[@type="geoshape"]/@nodeset');
-        return array_map(fn($n) => $n->nodeValue, iterator_to_array($nodes));
+        if ($nodes === false) {
+            return [];
+        }
+        
+        return array_map(
+            fn($n) => (string) $n->nodeValue, 
+            iterator_to_array($nodes)
+        );
     }
 }

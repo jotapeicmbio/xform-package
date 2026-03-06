@@ -12,6 +12,7 @@ class XformSurveyAttachmentTest extends TestCase
     public function shouldReturnFalseWhenXformNotHasAttachment(): void
     {
         $xform = file_get_contents('/var/www/html/tests/xforms/xform_geopoint');
+        $this->assertIsString($xform);
         $this->assertFalse((new Xform($xform))->hasAttachments());
     }
 
@@ -19,6 +20,7 @@ class XformSurveyAttachmentTest extends TestCase
     public function shouldReturnTrueWhenXformHasAttachment(): void
     {
         $xform = file_get_contents('/var/www/html/tests/xforms/xform_medias');
+        $this->assertIsString($xform);
         $this->assertTrue((new Xform($xform))->hasAttachments());
     }
 
@@ -33,6 +35,7 @@ class XformSurveyAttachmentTest extends TestCase
         ];
 
         $xform = file_get_contents('/var/www/html/tests/xforms/xform_medias');
+        $this->assertIsString($xform);
         $this->assertEquals($expected, (new Xform($xform))->getAttachments());
     }
 }

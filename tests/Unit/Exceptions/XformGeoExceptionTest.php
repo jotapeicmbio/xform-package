@@ -77,6 +77,7 @@ class XformGeoExceptionTest extends TestCase
         $this->assertArrayHasKey('country_bounds', $context);
         
         $bounds = $context['country_bounds'];
+        $this->assertIsArray($bounds);
         $this->assertArrayHasKey('north', $bounds);
         $this->assertArrayHasKey('south', $bounds);
         $this->assertArrayHasKey('east', $bounds);

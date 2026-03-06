@@ -11,28 +11,26 @@ class XformSurveyGeoTest extends TestCase
     #[Test]
     public function shouldReturnFalseWhenXformHasGeopoint(): void
     {
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_medias');
-        $this->assertFalse((new Xform($xform))->hasGeopoint());
+        $xform = file_get_contents('/var/www/html/tests/xforms/xform_medias');        $this->assertIsString($xform);        $this->assertFalse((new Xform($xform))->hasGeopoint());
     }
 
     #[Test]
     public function shouldReturnFalseWhenXformHasGeotrace(): void
     {
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_medias');
-        $this->assertFalse((new Xform($xform))->hasGeotrace());
+        $xform = file_get_contents('/var/www/html/tests/xforms/xform_medias');        $this->assertIsString($xform);        $this->assertFalse((new Xform($xform))->hasGeotrace());
     }
 
     #[Test]
     public function shouldReturnFalseWhenXformHasGeoshape(): void
     {
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_medias');
-        $this->assertFalse((new Xform($xform))->hasGeoshape());
+        $xform = file_get_contents('/var/www/html/tests/xforms/xform_medias');        $this->assertIsString($xform);        $this->assertFalse((new Xform($xform))->hasGeoshape());
     }
 
     #[Test]
     public function shouldReturnTrueWhenXformHasGeopoint(): void
     {
         $xform = file_get_contents('/var/www/html/tests/xforms/xform_geopoint');
+        $this->assertIsString($xform);
         $this->assertTrue((new Xform($xform))->hasGeopoint());
     }
 
@@ -40,6 +38,7 @@ class XformSurveyGeoTest extends TestCase
     public function shouldReturnTrueWhenXformHasGeotrace(): void
     {
         $xform = file_get_contents('/var/www/html/tests/xforms/xform_geopoint');
+        $this->assertIsString($xform);
         $this->assertTrue((new Xform($xform))->hasGeotrace());
     }
 
@@ -47,24 +46,28 @@ class XformSurveyGeoTest extends TestCase
     public function shouldReturnTrueWhenXformHasGeoshape(): void
     {
         $xform = file_get_contents('/var/www/html/tests/xforms/xform_geopoint');
+        $this->assertIsString($xform);
         $this->assertTrue((new Xform($xform))->hasGeoshape());
     }
 
     public function shouldReturnArrayWhenXformHasGeopoint(): void
     {
         $xform = file_get_contents('/var/www/html/tests/xforms/xlsform_geopoint');
+        $this->assertIsString($xform);
         $this->assertEquals("['/xlsform_geopoint/geopoint']", (new Xform($xform))->getGeopoints());
     }
 
     public function shouldReturnArrayWhenXformHasGeotrace(): void
     {
         $xform = file_get_contents('/var/www/html/tests/xforms/xlsform_geopoint');
+        $this->assertIsString($xform);
         $this->assertEquals("['/xlsform_geopoint/geotrace']", (new Xform($xform))->getGeotraces());
     }
 
     public function shouldReturnArrayWhenXformHasGeoshape(): void
     {
         $xform = file_get_contents('/var/www/html/tests/xforms/xlsform_geopoint');
+        $this->assertIsString($xform);
         $this->assertEquals("['/xlsform_geopoint/geoshape']", (new Xform($xform))->getGeoshapes());
     }
 }

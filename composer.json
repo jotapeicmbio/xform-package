@@ -16,6 +16,7 @@
         "php": ">=8.1"
     },
     "require-dev": {
+        "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^11.5"
     },
     "autoload": {
@@ -32,6 +33,18 @@
         "branch-alias": {
             "dev-main": "1.0-dev"
         }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test:coverage": "phpunit --coverage-html coverage",
+        "phpstan": "phpstan analyse --memory-limit=256M",
+        "phpstan:baseline": "phpstan analyse --generate-baseline",
+        "phpstan:clear": "phpstan clear-result-cache",
+        "code:check": [
+            "@phpstan",
+            "@test"
+        ],
+        "code:fix": "php-cs-fixer fix src tests"
     },
     "config": {
         "optimize-autoloader": true,
