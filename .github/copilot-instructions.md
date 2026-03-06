@@ -40,6 +40,8 @@ Biblioteca PHP especializada para processamento e manipulação de formulários 
 ```
 tests/
 ├── Unit/           # Testes unitários por classe/trait
+│   ├── Exceptions/ # Testes para hierarquia de exceções
+│   └── Concerns/   # Testes para traits
 ├── Integration/    # Testes de fluxo completo
 ├── xforms/         # Arquivos XForm para testes
 └── fixtures/       # Dados de teste padronizados
@@ -75,10 +77,16 @@ tests/
 
 ## 🔄 **Workflow de Desenvolvimento**
 
+### **TDD Obrigatório (Test-Driven Development)**
+1. 🔴 **Red**: Escrever teste que falha PRIMEIRO
+2. 🟢 **Green**: Implementar código mínimo para teste passar
+3. 🔵 **Refactor**: Melhorar código mantendo testes passando
+4. **Nunca implementar funcionalidade sem teste correspondente**
+
 ### **Desenvolvimento Incremental**
 1. **Pequenas mudanças frequentes** (commits atômicos)
 2. **Feature branches** para novas funcionalidades
-3. **Tests during development**: Escrever testes conforme desenvolve
+3. **TDD cycle**: Red → Green → Refactor para TODA mudança
 4. **Review antes merge**: Toda mudança passa por review
 
 ### **Commit Standards**
@@ -91,10 +99,12 @@ refactor: melhorar performance de XPath queries
 ```
 
 ### **Antes de Commit**
-- ✅ Executar `composer test`
+- ✅ **TDD completo**: Red → Green → Refactor cumprido
+- ✅ Executar `composer test` (100% pass)
 - ✅ Verificar `composer phpstan` (se configurado)
 - ✅ Confirmar PSR-12 compliance
 - ✅ Atualizar documentação se necessário
+- ✅ **Coverage**: Funcionalidade nova tem teste correspondente
 
 ## 🛡️ **Compatibilidade e Estabilidade**
 
@@ -143,9 +153,10 @@ XformException
 
 ## 🔍 **Code Review Checklist**
 
+- [ ] **TDD seguido**: Teste criado ANTES da implementação
 - [ ] Type hints em todos os métodos
 - [ ] PHPDoc completo
-- [ ] Testes com 100% coverage
+- [ ] Testes com 100% coverage da nova funcionalidade 
 - [ ] PSR-12 compliance
 - [ ] Performance considerada
 - [ ] Error handling apropriado
@@ -153,6 +164,7 @@ XformException
 - [ ] Documentação atualizada
 - [ ] Exemplos funcionais
 - [ ] Edge cases cobertos nos testes
+- [ ] **Red-Green-Refactor** cycle documentado
 
 ---
 
