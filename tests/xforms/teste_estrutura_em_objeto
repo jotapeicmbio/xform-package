@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa"
+    xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <h:head>
+        <h:title>Teste Estrutra em Objeto</h:title>
+        <model>
+            <instance>
+                <teste_estrutura_em_objeto id="teste_estrutura_em_objeto" version="2026020601">
+                    <uc />
+                    <estacao_amostral />
+                    <unidade_amostral />
+                    <coletor>
+                        <cpf />
+                        <nome />
+                    </coletor>
+                    <registros jr:template="">
+                        <today />
+                        <quantity />
+                        <coordenada />
+                    </registros>
+                    <meta>
+                    <instanceID />
+                    </meta>
+                </teste_estrutura_em_objeto>
+            </instance>
+            <bind nodeset="/teste_estrutura_em_objeto/uc" type="select1" />
+            <bind nodeset="/teste_estrutura_em_objeto/estacao_amostral" type="select1" />
+            <bind nodeset="/teste_estrutura_em_objeto/unidade_amostral" type="select1" />
+            <bind nodeset="/teste_estrutura_em_objeto/coletor/cpf" type="string" />
+            <bind nodeset="/teste_estrutura_em_objeto/coletor/nome" type="string" />
+            <bind jr:preload="date" jr:preloadParams="today" nodeset="/teste_estrutura_em_objeto/registros/today"
+                type="date" />
+            <bind nodeset="/teste_estrutura_em_objeto/registros/quantity" type="int" />
+            <bind nodeset="/teste_estrutura_em_objeto/registros/coordenada" type="geopoint" />
+            <bind calculate="concat('uuid:', uuid())" nodeset="/teste_estrutura_em_objeto/meta/instanceID"
+                readonly="true()" type="string" />
+        </model>
+    </h:head>
+    <h:body>
+        <select1 ref="/teste_estrutura_em_objeto/uc">
+            <label>Unidade de Conservação</label>
+            <item>
+                <label></label>
+                <value>num_key</value>
+            </item>
+        </select1>
+        <select1 ref="/teste_estrutura_em_objeto/estacao_amostral">
+            <label>Estação Amostral</label>
+            <item>
+                <label></label>
+                <value>num_key</value>
+            </item>
+        </select1>
+        <select1 ref="/teste_estrutura_em_objeto/unidade_amostral">
+            <label>Unidade Amostral</label>
+            <item>
+                <label></label>
+                <value>num_key</value>
+            </item>
+        </select1>
+        <group ref="/teste_estrutura_em_objeto/coletor">
+            <input ref="/teste_estrutura_em_objeto/coletor/cpf">
+            <label>CPF</label>
+            </input>
+            <input ref="/teste_estrutura_em_objeto/coletor/nome">
+            <label>Coletor</label>
+            </input>
+        </group>
+        <group ref="/teste_estrutura_em_objeto/registros">
+            <label></label>
+            <repeat nodeset="/teste_estrutura_em_objeto/registros">
+                <input ref="/teste_estrutura_em_objeto/registros/quantity">
+                <label>Quantidade</label>
+                </input>
+                <input ref="/teste_estrutura_em_objeto/registros/coordenada">
+                <label>Coordenada</label>
+                </input>
+            </repeat>
+        </group>
+    </h:body>
+</h:html>
