@@ -1,0 +1,336 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms" xmlns:odk="http://www.opendatakit.org/xforms">
+  <h:head>
+    <h:title>Survey Completo ICMBio - Biodiversidade</h:title>
+    <model odk:xforms-version="1.0.0">
+      <submission orx:auto-send="wifi_only" orx:auto-delete="false"/>
+      <instance>
+        <data id="survey_biodiversidade_completo" version="2026030905">
+          <grupo_basico>
+            <nome_formulario/>
+            <numero_registro/>
+            <valor_monetario/>
+            <data_coleta/>
+            <hora_coleta/>
+            <timestamp_completo/>
+            <instrucao_inicial/>
+          </grupo_basico>
+          <grupo_localizacao>
+            <coordenada_ponto/>
+            <trajeto/>
+            <area_estudo/>
+          </grupo_localizacao>
+          <grupo_contagem>
+            <qtd_machos>0</qtd_machos>
+            <qtd_femeas>0</qtd_femeas>
+            <qtd_total/>
+          </grupo_contagem>
+          <grupo_selecao>
+            <especie_observada/>
+            <tipos_habitat/>
+            <tem_filhotes/>
+            <qtd_filhotes/>
+          </grupo_selecao>
+          <grupo_validacao>
+            <cpf/>
+            <email/>
+            <idade/>
+            <peso/>
+          </grupo_validacao>
+          <grupo_media>
+            <foto_evidencia/>
+            <gravacao_som/>
+            <video_comportamento/>
+            <documento_anexo/>
+            <codigo_amostra/>
+          </grupo_media>
+          <registros_multiplos jr:template="">
+            <especie_registro/>
+            <quantidade_registro/>
+            <local_registro/>
+          </registros_multiplos>
+          <registros_multiplos>
+            <especie_registro/>
+            <quantidade_registro/>
+            <local_registro/>
+          </registros_multiplos>
+          <grupo_meta>
+            <inicio_formulario/>
+            <fim_formulario/>
+            <data_hoje/>
+            <id_dispositivo/>
+            <nome_usuario/>
+            <confirmacao_final/>
+          </grupo_meta>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <instance id="especies">
+        <root>
+          <item>
+            <name>jaguar</name>
+            <label>Jaguar (Panthera onca)</label>
+          </item>
+          <item>
+            <name>puma</name>
+            <label>Puma (Puma concolor)</label>
+          </item>
+          <item>
+            <name>jaguatirica</name>
+            <label>Jaguatirica (Leopardus pardalis)</label>
+          </item>
+          <item>
+            <name>anta</name>
+            <label>Anta (Tapirus terrestris)</label>
+          </item>
+          <item>
+            <name>capivara</name>
+            <label>Capivara (Hydrochoerus hydrochaeris)</label>
+          </item>
+          <item>
+            <name>lobo_guara</name>
+            <label>Lobo-guará (Chrysocyon brachyurus)</label>
+          </item>
+        </root>
+      </instance>
+      <instance id="habitats">
+        <root>
+          <item>
+            <name>mata_ciliar</name>
+            <label>Mata Ciliar</label>
+          </item>
+          <item>
+            <name>cerrado</name>
+            <label>Cerrado</label>
+          </item>
+          <item>
+            <name>pantanal</name>
+            <label>Pantanal</label>
+          </item>
+          <item>
+            <name>mata_atlantica</name>
+            <label>Mata Atlântica</label>
+          </item>
+          <item>
+            <name>caatinga</name>
+            <label>Caatinga</label>
+          </item>
+          <item>
+            <name>amazonia</name>
+            <label>Amazônia</label>
+          </item>
+        </root>
+      </instance>
+      <instance id="sim_nao">
+        <root>
+          <item>
+            <name>sim</name>
+            <label>Sim</label>
+          </item>
+          <item>
+            <name>nao</name>
+            <label>Não</label>
+          </item>
+        </root>
+      </instance>
+      <bind nodeset="/data/grupo_basico/nome_formulario" type="string" required="true()"/>
+      <bind nodeset="/data/grupo_basico/numero_registro" type="int" required="true()" constraint=". &gt;= 1" jr:constraintMsg="Deve ser maior que zero"/>
+      <bind nodeset="/data/grupo_basico/valor_monetario" type="decimal" constraint=". &gt;= 0" jr:constraintMsg="Deve ser positivo"/>
+      <bind nodeset="/data/grupo_basico/data_coleta" type="date" required="true()"/>
+      <bind nodeset="/data/grupo_basico/hora_coleta" type="time"/>
+      <bind nodeset="/data/grupo_basico/timestamp_completo" type="dateTime"/>
+      <bind nodeset="/data/grupo_basico/instrucao_inicial" readonly="true()" type="string"/>
+      <bind nodeset="/data/grupo_localizacao/coordenada_ponto" type="geopoint" required="true()"/>
+      <bind nodeset="/data/grupo_localizacao/trajeto" type="geotrace"/>
+      <bind nodeset="/data/grupo_localizacao/area_estudo" type="geoshape"/>
+      <bind nodeset="/data/grupo_contagem/qtd_machos" type="int" constraint=". &gt;= 0" jr:constraintMsg="Deve ser maior ou igual a zero"/>
+      <bind nodeset="/data/grupo_contagem/qtd_femeas" type="int" constraint=". &gt;= 0" jr:constraintMsg="Deve ser maior ou igual a zero"/>
+      <bind nodeset="/data/grupo_contagem/qtd_total" type="string" calculate=" /data/grupo_contagem/qtd_machos  +  /data/grupo_contagem/qtd_femeas "/>
+      <bind nodeset="/data/grupo_selecao/especie_observada" type="string" required="true()"/>
+      <bind nodeset="/data/grupo_selecao/tipos_habitat" type="string"/>
+      <bind nodeset="/data/grupo_selecao/tem_filhotes" type="string"/>
+      <bind nodeset="/data/grupo_selecao/qtd_filhotes" type="int" relevant=" /data/grupo_selecao/tem_filhotes  = &quot;sim&quot;"/>
+      <bind nodeset="/data/grupo_validacao/cpf" type="string" required="true()" constraint="regex(., &quot;^[0-9]{11}$&quot;)" jr:constraintMsg="CPF deve ter 11 dígitos"/>
+      <bind nodeset="/data/grupo_validacao/email" type="string" constraint="regex(., &quot;^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$&quot;)" jr:constraintMsg="E-mail inválido"/>
+      <bind nodeset="/data/grupo_validacao/idade" type="int" constraint=". &gt;= 18 and . &lt;= 100" jr:constraintMsg="Idade deve estar entre 18 e 100 anos"/>
+      <bind nodeset="/data/grupo_validacao/peso" type="decimal" constraint=". &gt; 0 and . &lt;= 1000" jr:constraintMsg="Peso deve estar entre 0 e 1000kg"/>
+      <bind nodeset="/data/grupo_media/foto_evidencia" type="binary"/>
+      <bind nodeset="/data/grupo_media/gravacao_som" type="binary"/>
+      <bind nodeset="/data/grupo_media/video_comportamento" type="binary"/>
+      <bind nodeset="/data/grupo_media/documento_anexo" type="binary"/>
+      <bind nodeset="/data/grupo_media/codigo_amostra" type="barcode"/>
+      <bind nodeset="/data/registros_multiplos/especie_registro" type="string" required="true()"/>
+      <bind nodeset="/data/registros_multiplos/quantidade_registro" type="int" required="true()" constraint=". &gt; 0" jr:constraintMsg="Deve ser maior que zero"/>
+      <bind nodeset="/data/registros_multiplos/local_registro" type="geopoint"/>
+      <bind nodeset="/data/grupo_meta/inicio_formulario" jr:preload="timestamp" type="dateTime" jr:preloadParams="start"/>
+      <bind nodeset="/data/grupo_meta/fim_formulario" jr:preload="timestamp" type="dateTime" jr:preloadParams="end"/>
+      <bind nodeset="/data/grupo_meta/data_hoje" jr:preload="date" type="date" jr:preloadParams="today"/>
+      <bind nodeset="/data/grupo_meta/id_dispositivo" jr:preload="property" type="string" jr:preloadParams="deviceid"/>
+      <bind nodeset="/data/grupo_meta/nome_usuario" jr:preload="property" type="string" jr:preloadParams="username"/>
+      <bind nodeset="/data/grupo_meta/confirmacao_final" type="string" required="true()"/>
+      <bind nodeset="/data/meta/instanceID" type="string" readonly="true()" jr:preload="uid"/>
+    </model>
+  </h:head>
+  <h:body class="theme-grid">
+    <group ref="/data/grupo_basico">
+      <label>Informações Básicas</label>
+      <input ref="/data/grupo_basico/nome_formulario">
+        <label>Nome do Formulário</label>
+        <hint>Digite o nome do formulário</hint>
+      </input>
+      <input ref="/data/grupo_basico/numero_registro">
+        <label>Número de Registro</label>
+        <hint>Número sequencial do registro</hint>
+      </input>
+      <input ref="/data/grupo_basico/valor_monetario" appearance="currency">
+        <label>Valor Monetário</label>
+        <hint>Valor em reais</hint>
+      </input>
+      <input ref="/data/grupo_basico/data_coleta" appearance="date-no-calendar">
+        <label>Data da Coleta</label>
+        <hint>Quando os dados foram coletados</hint>
+      </input>
+      <input ref="/data/grupo_basico/hora_coleta">
+        <label>Hora da Coleta</label>
+        <hint>Hora exata da coleta</hint>
+      </input>
+      <input ref="/data/grupo_basico/timestamp_completo">
+        <label>Data e Hora Completa</label>
+        <hint>Timestamp completo</hint>
+      </input>
+      <input ref="/data/grupo_basico/instrucao_inicial">
+        <label>Instruções</label>
+        <hint>Leia atentamente antes de prosseguir</hint>
+      </input>
+    </group>
+    <group ref="/data/grupo_localizacao">
+      <label>Dados Geográficos</label>
+      <input ref="/data/grupo_localizacao/coordenada_ponto" appearance="maps">
+        <label>Coordenada GPS</label>
+        <hint>Marque a localização exata</hint>
+      </input>
+      <input ref="/data/grupo_localizacao/trajeto" appearance="maps">
+        <label>Trajeto Percorrido</label>
+        <hint>Trace a rota realizada</hint>
+      </input>
+      <input ref="/data/grupo_localizacao/area_estudo" appearance="maps">
+        <label>Área de Estudo</label>
+        <hint>Delimite a área de interesse</hint>
+      </input>
+    </group>
+    <group ref="/data/grupo_contagem">
+      <label>Contagem de Animais</label>
+      <input ref="/data/grupo_contagem/qtd_machos">
+        <label>Machos</label>
+        <hint>Quantidade de machos observados</hint>
+      </input>
+      <input ref="/data/grupo_contagem/qtd_femeas">
+        <label>Fêmeas</label>
+        <hint>Quantidade de fêmeas observadas</hint>
+      </input>
+    </group>
+    <group ref="/data/grupo_selecao">
+      <label>Campos de Seleção</label>
+      <select1 ref="/data/grupo_selecao/especie_observada">
+        <label>Espécie Observada</label>
+        <hint>Selecione a espécie encontrada</hint>
+        <itemset nodeset="instance('especies')/root/item">
+          <value ref="name"/>
+          <label ref="label"/>
+        </itemset>
+      </select1>
+      <select ref="/data/grupo_selecao/tipos_habitat">
+        <label>Tipos de Habitat</label>
+        <hint>Selecione todos os habitats presentes</hint>
+        <itemset nodeset="instance('habitats')/root/item">
+          <value ref="name"/>
+          <label ref="label"/>
+        </itemset>
+      </select>
+      <select1 ref="/data/grupo_selecao/tem_filhotes">
+        <label>Tem Filhotes?</label>
+        <hint>A fêmea estava com filhotes?</hint>
+        <itemset nodeset="instance('sim_nao')/root/item">
+          <value ref="name"/>
+          <label ref="label"/>
+        </itemset>
+      </select1>
+      <input ref="/data/grupo_selecao/qtd_filhotes">
+        <label>Quantidade de Filhotes</label>
+        <hint>Quantos filhotes foram observados?</hint>
+      </input>
+    </group>
+    <group ref="/data/grupo_validacao">
+      <label>Campos com Validação</label>
+      <input ref="/data/grupo_validacao/cpf">
+        <label>CPF</label>
+        <hint>Digite o CPF do responsável</hint>
+      </input>
+      <input ref="/data/grupo_validacao/email">
+        <label>E-mail</label>
+        <hint>E-mail para contato</hint>
+      </input>
+      <input ref="/data/grupo_validacao/idade">
+        <label>Idade</label>
+        <hint>Idade do responsável</hint>
+      </input>
+      <input ref="/data/grupo_validacao/peso">
+        <label>Peso (kg)</label>
+        <hint>Peso do animal</hint>
+      </input>
+    </group>
+    <group ref="/data/grupo_media">
+      <label>Anexos e Mídia</label>
+      <upload ref="/data/grupo_media/foto_evidencia" mediatype="image/*">
+        <label>Foto de Evidência</label>
+        <hint>Tire uma foto do espécimen</hint>
+      </upload>
+      <upload ref="/data/grupo_media/gravacao_som" mediatype="audio/*">
+        <label>Gravação de Som</label>
+        <hint>Grave o som do animal</hint>
+      </upload>
+      <upload ref="/data/grupo_media/video_comportamento" mediatype="video/*">
+        <label>Vídeo Comportamento</label>
+        <hint>Filme o comportamento observado</hint>
+      </upload>
+      <upload ref="/data/grupo_media/documento_anexo" mediatype="application/*">
+        <label>Documento Anexo</label>
+        <hint>Anexe documento adicional</hint>
+      </upload>
+      <input ref="/data/grupo_media/codigo_amostra">
+        <label>Código da Amostra</label>
+        <hint>Escaneie o código da amostra</hint>
+      </input>
+    </group>
+    <group ref="/data/registros_multiplos">
+      <label>Registros Múltiplos</label>
+      <repeat nodeset="/data/registros_multiplos">
+        <select1 ref="/data/registros_multiplos/especie_registro">
+          <label>Espécie</label>
+          <hint>Selecione a espécie deste registro</hint>
+          <itemset nodeset="instance('especies')/root/item">
+            <value ref="name"/>
+            <label ref="label"/>
+          </itemset>
+        </select1>
+        <input ref="/data/registros_multiplos/quantidade_registro">
+          <label>Quantidade</label>
+          <hint>Quantos indivíduos desta espécie</hint>
+        </input>
+        <input ref="/data/registros_multiplos/local_registro">
+          <label>Local do Registro</label>
+          <hint>Coordenada específica deste registro</hint>
+        </input>
+      </repeat>
+    </group>
+    <group ref="/data/grupo_meta">
+      <label>Metadados</label>
+      <trigger ref="/data/grupo_meta/confirmacao_final">
+        <label>Confirmação</label>
+        <hint>Confirmo que todas as informações estão corretas</hint>
+      </trigger>
+    </group>
+  </h:body>
+</h:html>
