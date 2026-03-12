@@ -297,4 +297,238 @@ trait SurveyInstance
         
         return $survey;
     }
+
+    /**
+     * Retorna informações hierárquicas dos campos do survey com suporte a grupos repetitivos
+     * 
+     * @return array<int, array{name: string, label: string|null, type: string, children?: array<int, array{name: string, label: string|null, type: string}>}> Array hierárquico com informações dos campos
+     */
+    public function getSurveyHierarchical(): array
+    {
+        $survey = $this->getSurvey();
+        $hierarchical = [];
+        $processedRepeats = [];
+        
+        foreach ($survey as $field) {
+            $nodeset = $field['nodeset'];
+            $fieldName = $field['name'];
+            
+            // Verifica se é um campo dentro de um grupo repetitivo
+            if ($this->isRepeatField($nodeset)) {
+                $repeatGroupPath = $this->getRepeatGroupPath($nodeset);
+                $repeatGroupName = basename($repeatGroupPath);
+                
+                // Se ainda não processamos este grupo repetitivo
+                if (!isset($processedRepeats[$repeatGroupName])) {
+                    $processedRepeats[$repeatGroupName] = true;
+                    
+                    // Cria o grupo repetitivo
+                    $repeatgroup = [
+                        'name' => $repeatGroupName,
+                        'label' => $this->getRepeatGroupLabel($repeatGroupPath),
+                        'type' => 'repeat',
+                        'children' => []
+                    ];
+                    
+                    // Adiciona todos os filhos deste grupo repetitivo
+                    foreach ($survey as $childField) {
+                        if ($this->belongsToRepeatGroup($childField['nodeset'], $repeatGroupPath)) {
+                            $repeatgroup['children'][] = [
+                                'name' => $repeatGroupName . '/' . $childField['name'],
+                                'label' => $childField['label'],
+                                'type' => $this->mapFieldType($childField['type'])
+                            ];
+                        }
+                    }
+                    
+                    $hierarchical[] = $repeatgroup;
+                }
+            } 
+            // Campo simples (não está em grupo repetitivo)
+            elseif (!$this->isChildOfRepeatGroup($nodeset, $survey)) {
+                // Define o nome do campo
+                $finalFieldName = $fieldName;
+                
+                // Se é campo de grupo normal, adiciona prefixo do grupo
+                if ($this->isNormalGroupField($nodeset)) {
+                    $groupPath = $this->getNormalGroupPath($nodeset);
+                    $groupName = basename($groupPath);
+                    $finalFieldName = $groupName . '/' . $fieldName;
+                }
+                
+                $hierarchical[] = [
+                    'name' => $finalFieldName,
+                    'label' => $field['label'],
+                    'type' => $this->mapFieldType($field['type'])
+                ];
+            }
+        }
+        
+        return $hierarchical;
+    }
+    
+    /**
+     * Verifica se um campo pertence a um grupo repetitivo
+     */
+    private function isRepeatField(string $nodeset): bool
+    {
+        // Busca por elementos <repeat> no XML
+        $repeatNodes = $this->xpath()->query('//x:repeat');
+        if ($repeatNodes === false) {
+            return false;
+        }
+        
+        foreach ($repeatNodes as $repeatNode) {
+            $repeatNodeset = $repeatNode->getAttribute('nodeset');
+            if (str_starts_with($nodeset, $repeatNodeset . '/')) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Obtém o caminho do grupo repetitivo pai
+     */
+    private function getRepeatGroupPath(string $nodeset): string
+    {
+        $repeatNodes = $this->xpath()->query('//x:repeat');
+        if ($repeatNodes === false) {
+            return '';
+        }
+        
+        foreach ($repeatNodes as $repeatNode) {
+            $repeatNodeset = $repeatNode->getAttribute('nodeset');
+            if (str_starts_with($nodeset, $repeatNodeset . '/')) {
+                return $repeatNodeset;
+            }
+        }
+        
+        return '';
+    }
+    
+    /**
+     * Obtém o label de um grupo repetitivo
+     */
+    private function getRepeatGroupLabel(string $groupPath): ?string
+    {
+        // Busca o grupo correspondente no body
+        $groupNodes = $this->xpath()->query('//x:group[@ref="' . $groupPath . '"]');
+        if ($groupNodes === false || $groupNodes->length === 0) {
+            return null;
+        }
+        
+        $groupNode = $groupNodes->item(0);
+        $labelQueries = ['.//x:label', './/label'];
+        
+        foreach ($labelQueries as $labelQuery) {
+            $labelNodes = $this->xpath()->query($labelQuery, $groupNode);
+            if ($labelNodes !== false && $labelNodes->length > 0) {
+                return trim($labelNodes->item(0)->textContent) ?: null;
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Verifica se um campo pertence a um grupo repetitivo específico
+     */
+    private function belongsToRepeatGroup(string $fieldNodeset, string $groupPath): bool
+    {
+        return str_starts_with($fieldNodeset, $groupPath . '/');
+    }
+    
+    /**
+     * Verifica se um campo é filho de qualquer grupo repetitivo
+     */
+    private function isChildOfRepeatGroup(string $nodeset, array $allFields): bool
+    {
+        foreach ($allFields as $field) {
+            if ($this->isRepeatField($field['nodeset']) && 
+                $this->belongsToRepeatGroup($nodeset, $this->getRepeatGroupPath($field['nodeset']))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Verifica se um campo pertence a um grupo normal (não repetitivo)
+     */
+    private function isNormalGroupField(string $nodeset): bool
+    {
+        // Busca por elementos <group> no body (não repeat)
+        $groupNodes = $this->xpath()->query('//x:group[@ref]');
+        if ($groupNodes === false) {
+            return false;
+        }
+        
+        foreach ($groupNodes as $groupNode) {
+            $groupRef = $groupNode->getAttribute('ref');
+            // Verifica se não é um repeat group
+            if (!$this->isRepeatGroupRef($groupRef) && str_starts_with($nodeset, $groupRef . '/')) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Obtém o caminho do grupo normal que contém o campo
+     */
+    private function getNormalGroupPath(string $nodeset): string
+    {
+        $groupNodes = $this->xpath()->query('//x:group[@ref]');
+        if ($groupNodes === false) {
+            return '';
+        }
+        
+        foreach ($groupNodes as $groupNode) {
+            $groupRef = $groupNode->getAttribute('ref');
+            // Verifica se não é um repeat group e se o campo pertence a este grupo
+            if (!$this->isRepeatGroupRef($groupRef) && str_starts_with($nodeset, $groupRef . '/')) {
+                return $groupRef;
+            }
+        }
+        
+        return '';
+    }
+    
+    /**
+     * Verifica se um grupo é um repeat group
+     */
+    private function isRepeatGroupRef(string $groupRef): bool
+    {
+        $repeatNodes = $this->xpath()->query('//x:repeat[@nodeset="' . $groupRef . '"]');
+        return $repeatNodes !== false && $repeatNodes->length > 0;
+    }
+    
+    /**
+     * Mapeia tipos de campo XForm para tipos mais amigáveis
+     */
+    private function mapFieldType(?string $xformType): string
+    {
+        if ($xformType === null) {
+            return 'text';
+        }
+        
+        $typeMap = [
+            'string' => 'text',
+            'int' => 'integer',
+            'decimal' => 'decimal',
+            'binary' => 'file',
+            'geopoint' => 'geopoint',
+            'geotrace' => 'geotrace', 
+            'geoshape' => 'geoshape',
+            'barcode' => 'barcode',
+            'date' => 'date',
+            'time' => 'time',
+            'dateTime' => 'dateTime'
+        ];
+        
+        return $typeMap[$xformType] ?? 'text';
+    }
 }

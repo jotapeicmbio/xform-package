@@ -559,4 +559,327 @@ class SurveyBiodiversidadeCompletoTest extends TestCase
             ],
         ];
     }
+
+    /**
+     * @test
+     */
+    public function deve_retornar_survey_hierarquico_com_repeat_groups(): void
+    {
+        $xform = new Xform($this->validatedXmlContent);
+        $survey = $xform->getSurveyHierarchical();
+        
+        // Should be array
+        $this->assertIsArray($survey);
+        
+        // Should have at least some fields
+        $this->assertGreaterThan(0, count($survey));
+        
+        // Find repeat group (registros_multiplos) 
+        $repeatGroup = null;
+        foreach ($survey as $field) {
+            if ($field['name'] === 'registros_multiplos' && $field['type'] === 'repeat') {
+                $repeatGroup = $field;
+                break;
+            }
+        }
+        
+        $this->assertNotNull($repeatGroup, 'Deve ter grupo repetitivo registros_multiplos');
+        $this->assertArrayHasKey('children', $repeatGroup, 'Repeat group deve ter children');
+        $this->assertIsArray($repeatGroup['children'], 'Children deve ser array');
+        
+        // Check repeat group children structure
+        $this->assertGreaterThan(0, count($repeatGroup['children']), 'Repeat group deve ter filhos');
+        
+        // Verify child field structure
+        $firstChild = $repeatGroup['children'][0];
+        $this->assertArrayHasKey('name', $firstChild);
+        $this->assertArrayHasKey('label', $firstChild);
+        $this->assertArrayHasKey('type', $firstChild);
+        
+        // Check name format for repeat children (should be parent/child)
+        $this->assertStringContainsString('/', $firstChild['name'], 'Nome do filho deve conter / (parent/child)');
+        
+        // Check for specific expected fields in repeat group
+        $childNames = array_column($repeatGroup['children'], 'name');
+        $this->assertContains('registros_multiplos/especie_registro', $childNames);
+        $this->assertContains('registros_multiplos/quantidade_registro', $childNames);
+        $this->assertContains('registros_multiplos/local_registro', $childNames);
+    }
+
+    /**
+     * @test
+     */
+    public function deve_retornar_campos_simples_sem_children(): void
+    {
+        $xform = new Xform($this->validatedXmlContent);
+        $survey = $xform->getSurveyHierarchical();
+        
+        // Find a simple field (not repeat group)
+        $simpleField = null;
+        foreach ($survey as $field) {
+            if ($field['name'] === 'grupo_basico/nome_formulario') {
+                $simpleField = $field;
+                break;
+            }
+        }
+        
+        $this->assertNotNull($simpleField, 'Deve encontrar campo simples grupo_basico/nome_formulario');
+        $this->assertEquals('grupo_basico/nome_formulario', $simpleField['name']);
+        $this->assertEquals('Nome do Formulário', $simpleField['label']);
+        $this->assertEquals('text', $simpleField['type']);
+        $this->assertArrayNotHasKey('children', $simpleField, 'Campo simples não deve ter children');
+    }
+
+    /**
+     * @test
+     */
+    public function deve_retornar_estrutura_hierarquica_esperada_completa(): void
+    {
+        $xform = new Xform($this->validatedXmlContent);
+        $actualHierarchical = $xform->getSurveyHierarchical();
+        
+        $expectedHierarchical = $this->getExpectedHierarchicalArray();
+        
+        // Verifica quantidade total
+        $this->assertCount(
+            count($expectedHierarchical), 
+            $actualHierarchical,
+            sprintf('Esperado %d campos/grupos, obtido %d', count($expectedHierarchical), count($actualHierarchical))
+        );
+        
+        // Verifica cada campo/grupo individualmente
+        for ($i = 0; $i < count($expectedHierarchical); $i++) {
+            $expected = $expectedHierarchical[$i];
+            $actual = $actualHierarchical[$i] ?? null;
+            
+            $this->assertNotNull($actual, "Campo/grupo $i não encontrado no resultado");
+            
+            // Verifica estrutura básica
+            $this->assertEquals($expected['name'], $actual['name'], "Nome do campo $i não confere");
+            $this->assertEquals($expected['label'], $actual['label'], "Label do campo $i não confere");
+            $this->assertEquals($expected['type'], $actual['type'], "Tipo do campo $i não confere");
+            
+            // Se é repeat group, verifica children
+            if ($expected['type'] === 'repeat') {
+                $this->assertArrayHasKey('children', $actual, "Repeat group $i deve ter children");
+                $this->assertIsArray($actual['children'], "Children do grupo $i deve ser array");
+                
+                $expectedChildren = $expected['children'];
+                $actualChildren = $actual['children'];
+                
+                $this->assertCount(
+                    count($expectedChildren),
+                    $actualChildren,
+                    "Quantidade de children do grupo $i não confere"
+                );
+                
+                // Verifica cada child
+                for ($j = 0; $j < count($expectedChildren); $j++) {
+                    $expectedChild = $expectedChildren[$j];
+                    $actualChild = $actualChildren[$j] ?? null;
+                    
+                    $this->assertNotNull($actualChild, "Child $j do grupo $i não encontrado");
+                    $this->assertEquals($expectedChild['name'], $actualChild['name'], "Nome do child $j do grupo $i não confere");
+                    $this->assertEquals($expectedChild['label'], $actualChild['label'], "Label do child $j do grupo $i não confere"); 
+                    $this->assertEquals($expectedChild['type'], $actualChild['type'], "Tipo do child $j do grupo $i não confere");
+                }
+            } else {
+                // Campo simples não deve ter children
+                $this->assertArrayNotHasKey('children', $actual, "Campo simples $i não deve ter children");
+            }
+        }
+    }
+
+    private function getExpectedHierarchicalArray(): array
+    {
+        return [
+            [
+                'name' => 'grupo_basico/nome_formulario',
+                'label' => 'Nome do Formulário',
+                'type' => 'text',
+            ],
+            [
+                'name' => 'grupo_basico/numero_registro',
+                'label' => 'Número de Registro',
+                'type' => 'integer',
+            ],
+            [
+                'name' => 'grupo_basico/valor_monetario',
+                'label' => 'Valor Monetário',
+                'type' => 'decimal',
+            ],
+            [
+                'name' => 'grupo_basico/data_coleta',
+                'label' => 'Data da Coleta',
+                'type' => 'date',
+            ],
+            [
+                'name' => 'grupo_basico/hora_coleta',
+                'label' => 'Hora da Coleta',
+                'type' => 'time',
+            ],
+            [
+                'name' => 'grupo_basico/timestamp_completo',
+                'label' => 'Data e Hora Completa',
+                'type' => 'dateTime',
+            ],
+            [
+                'name' => 'grupo_basico/instrucao_inicial',
+                'label' => 'Instruções',
+                'type' => 'text',
+            ],
+            [
+                'name' => 'grupo_localizacao/coordenada_ponto',
+                'label' => 'Coordenada GPS',
+                'type' => 'geopoint',
+            ],
+            [
+                'name' => 'grupo_localizacao/trajeto',
+                'label' => 'Trajeto Percorrido',
+                'type' => 'geotrace',
+            ],
+            [
+                'name' => 'grupo_localizacao/area_estudo',
+                'label' => 'Área de Estudo',
+                'type' => 'geoshape',
+            ],
+            [
+                'name' => 'grupo_contagem/qtd_machos',
+                'label' => 'Machos',
+                'type' => 'integer',
+            ],
+            [
+                'name' => 'grupo_contagem/qtd_femeas',
+                'label' => 'Fêmeas',
+                'type' => 'integer',
+            ],
+            [
+                'name' => 'grupo_contagem/qtd_total',
+                'label' => null,
+                'type' => 'text',
+            ],
+            [
+                'name' => 'grupo_selecao/especie_observada',
+                'label' => 'Espécie Observada',
+                'type' => 'text',
+            ],
+            [
+                'name' => 'grupo_selecao/tipos_habitat',
+                'label' => 'Tipos de Habitat',
+                'type' => 'text',
+            ],
+            [
+                'name' => 'grupo_selecao/tem_filhotes',
+                'label' => 'Tem Filhotes?',
+                'type' => 'text',
+            ],
+            [
+                'name' => 'grupo_selecao/qtd_filhotes',
+                'label' => 'Quantidade de Filhotes',
+                'type' => 'integer',
+            ],
+            [
+                'name' => 'grupo_validacao/cpf',
+                'label' => 'CPF',
+                'type' => 'text',
+            ],
+            [
+                'name' => 'grupo_validacao/email',
+                'label' => 'E-mail',
+                'type' => 'text',
+            ],
+            [
+                'name' => 'grupo_validacao/idade',
+                'label' => 'Idade',
+                'type' => 'integer',
+            ],
+            [
+                'name' => 'grupo_validacao/peso',
+                'label' => 'Peso (kg)',
+                'type' => 'decimal',
+            ],
+            [
+                'name' => 'grupo_media/foto_evidencia',
+                'label' => null,
+                'type' => 'file',
+            ],
+            [
+                'name' => 'grupo_media/gravacao_som',
+                'label' => null,
+                'type' => 'file',
+            ],
+            [
+                'name' => 'grupo_media/video_comportamento',
+                'label' => null,
+                'type' => 'file',
+            ],
+            [
+                'name' => 'grupo_media/documento_anexo',
+                'label' => null,
+                'type' => 'file',
+            ],
+            [
+                'name' => 'grupo_media/codigo_amostra',
+                'label' => 'Código da Amostra',
+                'type' => 'barcode',
+            ],
+            [
+                'name' => 'registros_multiplos',
+                'label' => 'Registros Múltiplos',
+                'type' => 'repeat',
+                'children' => [
+                    [
+                        'name' => 'registros_multiplos/especie_registro',
+                        'label' => 'Espécie',
+                        'type' => 'text',
+                    ],
+                    [
+                        'name' => 'registros_multiplos/quantidade_registro',
+                        'label' => 'Quantidade',
+                        'type' => 'integer',
+                    ],
+                    [
+                        'name' => 'registros_multiplos/local_registro',
+                        'label' => 'Local do Registro',
+                        'type' => 'geopoint',
+                    ],
+                ],
+            ],
+            [
+                'name' => 'grupo_meta/inicio_formulario',
+                'label' => null,
+                'type' => 'dateTime',
+            ],
+            [
+                'name' => 'grupo_meta/fim_formulario',
+                'label' => null,
+                'type' => 'dateTime',
+            ],
+            [
+                'name' => 'grupo_meta/data_hoje',
+                'label' => null,
+                'type' => 'date',
+            ],
+            [
+                'name' => 'grupo_meta/id_dispositivo',
+                'label' => null,
+                'type' => 'text',
+            ],
+            [
+                'name' => 'grupo_meta/nome_usuario',
+                'label' => null,
+                'type' => 'text',
+            ],
+            [
+                'name' => 'grupo_meta/confirmacao_final',
+                'label' => 'Confirmação',
+                'type' => 'text',
+            ],
+            [
+                'name' => 'instanceID',
+                'label' => null,
+                'type' => 'text',
+            ],
+        ];
+    }
 }
