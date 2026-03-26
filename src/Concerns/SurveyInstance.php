@@ -299,9 +299,15 @@ trait SurveyInstance
     }
 
     /**
-     * Retorna informações hierárquicas dos campos do survey com suporte a grupos repetitivos
+     * Retorna informações hierárquicas dos campos do survey com suporte a grupos repetitivos e choices
      * 
-     * @return array<int, array{name: string, label: string|null, type: string, children?: array<int, array{name: string, label: string|null, type: string}>}> Array hierárquico com informações dos campos
+     * Este método processa todos os campos do formulário e retorna uma estrutura hierárquica que inclui:
+     * - Campos simples com seus tipos, labels e choices (quando aplicável)
+     * - Grupos repetitivos com seus filhos aninhados 
+     * - Diferenciação entre tipos select1 (uma escolha) e select (múltiplas escolhas)
+     * - Choices extraídos tanto de elementos estáticos (item/label/value) quanto dinâmicos (instances)
+     * 
+     * @return array<int, array{name: string, label: string|null, type: string, choices?: array<int, array{value: string, label: string}>, children?: array<int, array{name: string, label: string|null, type: string, choices?: array<int, array{value: string, label: string}>}>}> Array hierárquico com informações dos campos
      */
     public function getSurveyHierarchical(): array
     {
@@ -333,11 +339,19 @@ trait SurveyInstance
                     // Adiciona todos os filhos deste grupo repetitivo
                     foreach ($survey as $childField) {
                         if ($this->belongsToRepeatGroup($childField['nodeset'], $repeatGroupPath)) {
-                            $repeatgroup['children'][] = [
+                            $childNode = [
                                 'name' => $repeatGroupName . '/' . $childField['name'],
                                 'label' => $childField['label'],
-                                'type' => $this->mapFieldType($childField['type'])
+                                'type' => $this->mapFieldType($childField['type'], $childField['nodeset'])
                             ];
+                            
+                            // Adiciona choices se o campo tiver
+                            $choices = $this->getChoicesForField($childField['nodeset']);
+                            if ($choices !== null) {
+                                $childNode['choices'] = $choices;
+                            }
+                            
+                            $repeatgroup['children'][] = $childNode;
                         }
                     }
                     
@@ -356,11 +370,19 @@ trait SurveyInstance
                     $finalFieldName = $groupName . '/' . $fieldName;
                 }
                 
-                $hierarchical[] = [
+                $fieldNode = [
                     'name' => $finalFieldName,
                     'label' => $field['label'],
-                    'type' => $this->mapFieldType($field['type'])
+                    'type' => $this->mapFieldType($field['type'], $nodeset)
                 ];
+                
+                // Adiciona choices se o campo tiver
+                $choices = $this->getChoicesForField($nodeset);
+                if ($choices !== null) {
+                    $fieldNode['choices'] = $choices;
+                }
+                
+                $hierarchical[] = $fieldNode;
             }
         }
         
@@ -507,10 +529,23 @@ trait SurveyInstance
     }
     
     /**
-     * Mapeia tipos de campo XForm para tipos mais amigáveis
+     * Mapeia tipos de campo XForm para tipos mais amigáveis, incluindo detecção de select1/select
+     * 
+     * Primeiro verifica se o campo é um elemento de seleção (select1/select) através do nodeset.
+     * Se não for, aplica mapeamento padrão de tipos XForm para tipos user-friendly.
+     * 
+     * @param string|null $xformType Tipo do bind XForm (string, int, decimal, etc.)
+     * @param string $nodeset Nodeset do campo para detecção de elementos select
+     * @return string Tipo amigável mapeado (text, integer, select1, select, etc.)
      */
-    private function mapFieldType(?string $xformType): string
+    private function mapFieldType(?string $xformType, string $nodeset = ''): string
     {
+        // Primeiro verifica se é um campo de seleção
+        $selectType = $this->getSelectElementType($nodeset);
+        if ($selectType !== null) {
+            return $selectType;
+        }
+        
         if ($xformType === null) {
             return 'text';
         }
@@ -530,5 +565,274 @@ trait SurveyInstance
         ];
         
         return $typeMap[$xformType] ?? 'text';
+    }
+    
+    /**
+     * Determina se um campo é select1 ou select baseado no elemento do body
+     * 
+     * @return string|null Retorna 'select1', 'select' ou null se não for um campo de seleção
+     */
+    private function getSelectElementType(string $nodeset): ?string
+    {
+        if ($nodeset === '') {
+            return null;
+        }
+        
+        // Busca por elementos select1 e select no body
+        $queries = [
+            '//h:body//*[self::x:select1][@ref="' . $nodeset . '"]',   // Namespace prefixado
+            '//h:body//*[self::select1][@ref="' . $nodeset . '"]',      // Namespace padrão
+            '//h:body//*[self::x:select][@ref="' . $nodeset . '"]',     // Namespace prefixado
+            '//h:body//*[self::select][@ref="' . $nodeset . '"]'        // Namespace padrão
+        ];
+        
+        foreach ($queries as $query) {
+            $nodes = $this->xpath()->query($query);
+            if ($nodes !== false && $nodes->length > 0) {
+                $tagName = $nodes->item(0)->localName;
+                return $tagName; // Retorna 'select1' ou 'select'
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Extrai todas as instâncias secundárias do modelo
+     * 
+     * @return array<string, array<int, array{name: string, label: string}>> Array indexado por ID da instância
+     */
+    private function getSecondaryInstances(): array
+    {
+        $instances = [];
+        
+        // Busca por instâncias secundárias (com ID)
+        $queries = [
+            '//x:model/x:instance[@id]',  // Namespace prefixado
+            '//model/instance[@id]'       // Namespace padrão
+        ];
+        
+        $nodes = null;
+        foreach ($queries as $query) {
+            $nodes = $this->xpath()->query($query);
+            if ($nodes !== false && $nodes->length > 0) {
+                break;
+            }
+        }
+        
+        if ($nodes === false) {
+            return [];
+        }
+        
+        foreach ($nodes as $node) {
+            $instanceId = $node->getAttribute('id');
+            if ($instanceId === '') {
+                continue;
+            }
+            
+            $instances[$instanceId] = [];
+            
+            // Busca por itens dentro da instância
+            $itemQueries = ['.//item', './/x:item'];
+            
+            foreach ($itemQueries as $itemQuery) {
+                $itemNodes = $this->xpath()->query($itemQuery, $node);
+                if ($itemNodes !== false && $itemNodes->length > 0) {
+                    foreach ($itemNodes as $itemNode) {
+                        $nameQueries = ['.//name', './/x:name'];
+                        $labelQueries = ['.//label', './/x:label'];
+                        
+                        $name = '';
+                        $label = '';
+                        
+                        // Extrai name
+                        foreach ($nameQueries as $nameQuery) {
+                            $nameNodes = $this->xpath()->query($nameQuery, $itemNode);
+                            if ($nameNodes !== false && $nameNodes->length > 0) {
+                                $name = trim($nameNodes->item(0)->textContent);
+                                break;
+                            }
+                        }
+                        
+                        // Extrai label
+                        foreach ($labelQueries as $labelQuery) {
+                            $labelNodes = $this->xpath()->query($labelQuery, $itemNode);
+                            if ($labelNodes !== false && $labelNodes->length > 0) {
+                                $label = trim($labelNodes->item(0)->textContent);
+                                break;
+                            }
+                        }
+                        
+                        if ($name !== '') {
+                            $instances[$instanceId][] = [
+                                'value' => $name,
+                                'label' => $label
+                            ];
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        
+        return $instances;
+    }
+    
+    /**
+     * Extrai choices estáticas de um elemento select (item/label/value)
+     * 
+     * @return array<int, array{value: string, label: string}> Array de choices
+     */
+    private function getStaticChoices(string $nodeset): array
+    {
+        $choices = [];
+        
+        // Busca o elemento select/select1 correspondente
+        $queries = [
+            '//h:body//*[self::x:select1 or self::x:select][@ref="' . $nodeset . '"]',
+            '//h:body//*[self::select1 or self::select][@ref="' . $nodeset . '"]'
+        ];
+        
+        $selectNode = null;
+        foreach ($queries as $query) {
+            $nodes = $this->xpath()->query($query);
+            if ($nodes !== false && $nodes->length > 0) {
+                $selectNode = $nodes->item(0);
+                break;
+            }
+        }
+        
+        if ($selectNode === null) {
+            return [];
+        }
+        
+        // Busca por elementos <item> dentro do select
+        $itemQueries = ['.//x:item', './/item'];
+        
+        foreach ($itemQueries as $itemQuery) {
+            $itemNodes = $this->xpath()->query($itemQuery, $selectNode);
+            if ($itemNodes !== false && $itemNodes->length > 0) {
+                foreach ($itemNodes as $itemNode) {
+                    $labelQueries = ['.//x:label', './/label'];
+                    $valueQueries = ['.//x:value', './/value'];
+                    
+                    $label = '';
+                    $value = '';
+                    
+                    // Extrai label
+                    foreach ($labelQueries as $labelQuery) {
+                        $labelNodes = $this->xpath()->query($labelQuery, $itemNode);
+                        if ($labelNodes !== false && $labelNodes->length > 0) {
+                            $label = trim($labelNodes->item(0)->textContent);
+                            break;
+                        }
+                    }
+                    
+                    // Extrai value
+                    foreach ($valueQueries as $valueQuery) {
+                        $valueNodes = $this->xpath()->query($valueQuery, $itemNode);
+                        if ($valueNodes !== false && $valueNodes->length > 0) {
+                            $value = trim($valueNodes->item(0)->textContent);
+                            break;
+                        }
+                    }
+                    
+                    if ($value !== '') {
+                        $choices[] = [
+                            'value' => $value,
+                            'label' => $label
+                        ];
+                    }
+                }
+                break;
+            }
+        }
+        
+        return $choices;
+    }
+    
+    /**
+     * Extrai choices dinâmicas de um elemento que usa itemset
+     * 
+     * @return array<int, array{value: string, label: string}> Array de choices
+     */
+    private function getDynamicChoices(string $nodeset): array
+    {
+        // Busca o elemento select/select1 correspondente
+        $queries = [
+            '//h:body//*[self::x:select1 or self::x:select][@ref="' . $nodeset . '"]',
+            '//h:body//*[self::select1 or self::select][@ref="' . $nodeset . '"]'
+        ];
+        
+        $selectNode = null;
+        foreach ($queries as $query) {
+            $nodes = $this->xpath()->query($query);
+            if ($nodes !== false && $nodes->length > 0) {
+                $selectNode = $nodes->item(0);
+                break;
+            }
+        }
+        
+        if ($selectNode === null) {
+            return [];
+        }
+        
+        // Busca por elemento <itemset>
+        $itemsetQueries = ['.//x:itemset', './/itemset'];
+        
+        $itemsetNode = null;
+        foreach ($itemsetQueries as $itemsetQuery) {
+            $itemsetNodes = $this->xpath()->query($itemsetQuery, $selectNode);
+            if ($itemsetNodes !== false && $itemsetNodes->length > 0) {
+                $itemsetNode = $itemsetNodes->item(0);
+                break;
+            }
+        }
+        
+        if ($itemsetNode === null) {
+            return [];
+        }
+        
+        // Extrai o nodeset do itemset para identificar a instância
+        $itemsetNodeset = $itemsetNode->getAttribute('nodeset');
+        if ($itemsetNodeset === '') {
+            return [];
+        }
+        
+        // Parse do nodeset para extrair o ID da instância
+        // Formato: instance('instanceId')/root/item
+        if (preg_match("/instance\('([^']+)'\)/", $itemsetNodeset, $matches)) {
+            $instanceId = $matches[1];
+            $instances = $this->getSecondaryInstances();
+            
+            if (isset($instances[$instanceId])) {
+                return $instances[$instanceId];
+            }
+        }
+        
+        return [];
+    }
+    
+    /**
+     * Obtém choices para um campo específico (static ou dynamic)
+     * 
+     * @return array<int, array{value: string, label: string}>|null Array de choices ou null se não for um campo de escolha
+     */
+    private function getChoicesForField(string $nodeset): ?array
+    {
+        // Primeiro tenta choices estáticas
+        $staticChoices = $this->getStaticChoices($nodeset);
+        if (!empty($staticChoices)) {
+            return $staticChoices;
+        }
+        
+        // Se não encontrou estáticas, tenta dinâmicas
+        $dynamicChoices = $this->getDynamicChoices($nodeset);
+        if (!empty($dynamicChoices)) {
+            return $dynamicChoices;
+        }
+        
+        // Se não é um campo de choice, retorna null
+        return null;
     }
 }

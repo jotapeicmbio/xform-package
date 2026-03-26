@@ -659,6 +659,30 @@ class SurveyBiodiversidadeCompletoTest extends TestCase
             $this->assertEquals($expected['label'], $actual['label'], "Label do campo $i não confere");
             $this->assertEquals($expected['type'], $actual['type'], "Tipo do campo $i não confere");
             
+            // Se campo tem choices, verifica choices
+            if (isset($expected['choices'])) {
+                $this->assertArrayHasKey('choices', $actual, "Campo $i deve ter choices");
+                $this->assertIsArray($actual['choices'], "Choices do campo $i deve ser array");
+                $this->assertCount(
+                    count($expected['choices']),
+                    $actual['choices'],
+                    "Quantidade de choices do campo $i não confere"
+                );
+                
+                // Verifica cada choice
+                for ($c = 0; $c < count($expected['choices']); $c++) {
+                    $expectedChoice = $expected['choices'][$c];
+                    $actualChoice = $actual['choices'][$c] ?? null;
+                    
+                    $this->assertNotNull($actualChoice, "Choice $c do campo $i não encontrada");
+                    $this->assertEquals($expectedChoice['value'], $actualChoice['value'], "Value da choice $c do campo $i não confere");
+                    $this->assertEquals($expectedChoice['label'], $actualChoice['label'], "Label da choice $c do campo $i não confere");
+                }
+            } else {
+                // Campo sem choices não deve ter o atributo
+                $this->assertArrayNotHasKey('choices', $actual, "Campo simples $i não deve ter choices");
+            }
+            
             // Se é repeat group, verifica children
             if ($expected['type'] === 'repeat') {
                 $this->assertArrayHasKey('children', $actual, "Repeat group $i deve ter children");
@@ -682,6 +706,30 @@ class SurveyBiodiversidadeCompletoTest extends TestCase
                     $this->assertEquals($expectedChild['name'], $actualChild['name'], "Nome do child $j do grupo $i não confere");
                     $this->assertEquals($expectedChild['label'], $actualChild['label'], "Label do child $j do grupo $i não confere"); 
                     $this->assertEquals($expectedChild['type'], $actualChild['type'], "Tipo do child $j do grupo $i não confere");
+                    
+                    // Se child tem choices, verifica choices
+                    if (isset($expectedChild['choices'])) {
+                        $this->assertArrayHasKey('choices', $actualChild, "Child $j do grupo $i deve ter choices");
+                        $this->assertIsArray($actualChild['choices'], "Choices do child $j do grupo $i deve ser array");
+                        $this->assertCount(
+                            count($expectedChild['choices']),
+                            $actualChild['choices'],
+                            "Quantidade de choices do child $j do grupo $i não confere"
+                        );
+                        
+                        // Verifica cada choice do child
+                        for ($c = 0; $c < count($expectedChild['choices']); $c++) {
+                            $expectedChoice = $expectedChild['choices'][$c];
+                            $actualChoice = $actualChild['choices'][$c] ?? null;
+                            
+                            $this->assertNotNull($actualChoice, "Choice $c do child $j do grupo $i não encontrada");
+                            $this->assertEquals($expectedChoice['value'], $actualChoice['value'], "Value da choice $c do child $j do grupo $i não confere");
+                            $this->assertEquals($expectedChoice['label'], $actualChoice['label'], "Label da choice $c do child $j do grupo $i não confere");
+                        }
+                    } else {
+                        // Child sem choices não deve ter o atributo
+                        $this->assertArrayNotHasKey('choices', $actualChild, "Child simples $j do grupo $i não deve ter choices");
+                    }
                 }
             } else {
                 // Campo simples não deve ter children
@@ -761,17 +809,37 @@ class SurveyBiodiversidadeCompletoTest extends TestCase
             [
                 'name' => 'grupo_selecao/especie_observada',
                 'label' => 'Espécie Observada',
-                'type' => 'text',
+                'type' => 'select1',
+                'choices' => [
+                    ['value' => 'jaguar', 'label' => 'Jaguar (Panthera onca)'],
+                    ['value' => 'puma', 'label' => 'Puma (Puma concolor)'],
+                    ['value' => 'jaguatirica', 'label' => 'Jaguatirica (Leopardus pardalis)'],
+                    ['value' => 'anta', 'label' => 'Anta (Tapirus terrestris)'],
+                    ['value' => 'capivara', 'label' => 'Capivara (Hydrochoerus hydrochaeris)'],
+                    ['value' => 'lobo_guara', 'label' => 'Lobo-guará (Chrysocyon brachyurus)'],
+                ],
             ],
             [
                 'name' => 'grupo_selecao/tipos_habitat',
                 'label' => 'Tipos de Habitat',
-                'type' => 'text',
+                'type' => 'select',
+                'choices' => [
+                    ['value' => 'mata_ciliar', 'label' => 'Mata Ciliar'],
+                    ['value' => 'cerrado', 'label' => 'Cerrado'],
+                    ['value' => 'pantanal', 'label' => 'Pantanal'],
+                    ['value' => 'mata_atlantica', 'label' => 'Mata Atlântica'],
+                    ['value' => 'caatinga', 'label' => 'Caatinga'],
+                    ['value' => 'amazonia', 'label' => 'Amazônia'],
+                ],
             ],
             [
                 'name' => 'grupo_selecao/tem_filhotes',
                 'label' => 'Tem Filhotes?',
-                'type' => 'text',
+                'type' => 'select1',
+                'choices' => [
+                    ['value' => 'sim', 'label' => 'Sim'],
+                    ['value' => 'nao', 'label' => 'Não'],
+                ],
             ],
             [
                 'name' => 'grupo_selecao/qtd_filhotes',
@@ -831,7 +899,15 @@ class SurveyBiodiversidadeCompletoTest extends TestCase
                     [
                         'name' => 'registros_multiplos/especie_registro',
                         'label' => 'Espécie',
-                        'type' => 'text',
+                        'type' => 'select1',
+                        'choices' => [
+                            ['value' => 'jaguar', 'label' => 'Jaguar (Panthera onca)'],
+                            ['value' => 'puma', 'label' => 'Puma (Puma concolor)'],
+                            ['value' => 'jaguatirica', 'label' => 'Jaguatirica (Leopardus pardalis)'],
+                            ['value' => 'anta', 'label' => 'Anta (Tapirus terrestris)'],
+                            ['value' => 'capivara', 'label' => 'Capivara (Hydrochoerus hydrochaeris)'],
+                            ['value' => 'lobo_guara', 'label' => 'Lobo-guará (Chrysocyon brachyurus)'],
+                        ],
                     ],
                     [
                         'name' => 'registros_multiplos/quantidade_registro',
