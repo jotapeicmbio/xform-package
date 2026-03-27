@@ -145,13 +145,16 @@ trait SurveyInstance
     }
 
     /**
-     * Extrai labels e hints dos elementos do body
+     * Extrai labels e hints dos elementos do body, incluindo resolução de referências itext
      * 
      * @return array<string, array{label: string|null, hint: string|null}> Array indexado por ref
      */
     public function getBodyLabels(): array
     {
         $labels = [];
+        
+        // Extrai traduções do itext uma vez
+        $itextTranslations = $this->getItextTranslations();
         
         // Tenta ambos os namespaces para elements do body
         $queries = [
@@ -183,7 +186,17 @@ trait SurveyInstance
             foreach ($labelQueries as $labelQuery) {
                 $labelNodes = $this->xpath()->query($labelQuery, $node);
                 if ($labelNodes !== false && $labelNodes->length > 0) {
-                    $label = trim($labelNodes->item(0)->textContent);
+                    $labelNode = $labelNodes->item(0);
+                    
+                    // Verifica se é referência itext
+                    $refAttribute = $labelNode->getAttribute('ref');
+                    if ($refAttribute !== '') {
+                        // Resolve referência itext
+                        $label = $this->resolveItextReference($refAttribute, $itextTranslations);
+                    } else {
+                        // Texto direto
+                        $label = trim($labelNode->textContent);
+                    }
                     break;
                 }
             }
@@ -194,7 +207,17 @@ trait SurveyInstance
             foreach ($hintQueries as $hintQuery) {
                 $hintNodes = $this->xpath()->query($hintQuery, $node);
                 if ($hintNodes !== false && $hintNodes->length > 0) {
-                    $hint = trim($hintNodes->item(0)->textContent);
+                    $hintNode = $hintNodes->item(0);
+                    
+                    // Verifica se é referência itext
+                    $refAttribute = $hintNode->getAttribute('ref');
+                    if ($refAttribute !== '') {
+                        // Resolve referência itext
+                        $hint = $this->resolveItextReference($refAttribute, $itextTranslations);
+                    } else {
+                        // Texto direto
+                        $hint = trim($hintNode->textContent);
+                    }
                     break;
                 }
             }
@@ -833,6 +856,123 @@ trait SurveyInstance
         }
         
         // Se não é um campo de choice, retorna null
+        return null;
+    }
+    
+    /**
+     * Extrai todas as traduções da seção itext do XForm
+     * 
+     * O itext é o sistema de internacionalização do XForm que permite definir textos
+     * em múltiplas línguas. Este método extrai a tradução padrão ou primeira disponível.
+     * Suporta tanto elementos simples quanto elementos com imagens (ignora form="image").
+     * 
+     * @return array<string, string> Array com ID do texto como chave e valor traduzido
+     * 
+     * @example
+     * // Retorna: ['/path/field:label' => 'Nome do Campo', ...]
+     */
+    private function getItextTranslations(): array
+    {
+        $translations = [];
+        
+        // Busca pela seção itext no modelo
+        $queries = [
+            '//x:model/x:itext',  // Namespace prefixado
+            '//model/itext'       // Namespace padrão
+        ];
+        
+        $itextNode = null;
+        foreach ($queries as $query) {
+            $nodes = $this->xpath()->query($query);
+            if ($nodes !== false && $nodes->length > 0) {
+                $itextNode = $nodes->item(0);
+                break;
+            }
+        }
+        
+        if ($itextNode === null) {
+            return [];
+        }
+        
+        // Busca pela tradução padrão ou primeira tradução
+        $translationQueries = [
+            './/x:translation[@default="true()"]',  // Tradução padrão prefixada
+            './/translation[@default="true()"]',    // Tradução padrão não prefixada
+            './/x:translation[1]',                   // Primeira tradução prefixada
+            './/translation[1]'                      // Primeira tradução não prefixada
+        ];
+        
+        $translationNode = null;
+        foreach ($translationQueries as $translationQuery) {
+            $translationNodes = $this->xpath()->query($translationQuery, $itextNode);
+            if ($translationNodes !== false && $translationNodes->length > 0) {
+                $translationNode = $translationNodes->item(0);
+                break;
+            }
+        }
+        
+        if ($translationNode === null) {
+            return [];
+        }
+        
+        // Extrai todos os textos da tradução
+        $textQueries = ['.//x:text[@id]', './/text[@id]'];
+        
+        foreach ($textQueries as $textQuery) {
+            $textNodes = $this->xpath()->query($textQuery, $translationNode);
+            if ($textNodes !== false && $textNodes->length > 0) {
+                foreach ($textNodes as $textNode) {
+                    $id = $textNode->getAttribute('id');
+                    if ($id === '') {
+                        continue;
+                    }
+                    
+                    // Busca por elemento value (sem form="image")
+                    $valueQueries = ['.//x:value[not(@form="image")]', './/value[not(@form="image")]'];
+                    
+                    foreach ($valueQueries as $valueQuery) {
+                        $valueNodes = $this->xpath()->query($valueQuery, $textNode);
+                        if ($valueNodes !== false && $valueNodes->length > 0) {
+                            $value = trim($valueNodes->item(0)->textContent);
+                            if ($value !== '') {
+                                $translations[$id] = $value;
+                                break;
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        
+        return $translations;
+    }
+    
+    /**
+     * Resolve uma referência itext para seu valor de texto
+     * 
+     * O itext permite referenciar textos através de expressões como jr:itext('/path:label').
+     * Este método faz o parse da referência e busca o valor correspondente nas traduções.
+     * 
+     * @param string $itextRef Referência no formato "jr:itext('/path:label')"
+     * @param array<string, string> $translations Array de traduções disponíveis
+     * @return string|null Texto resolvido ou null se não encontrado
+     * 
+     * @example
+     * // $itextRef = "jr:itext('/PEIXES/uc:label')"
+     * // $translations = ['/PEIXES/uc:label' => 'Unidade de Conservação']
+     * // Retorna: 'Unidade de Conservação'
+     */
+    private function resolveItextReference(string $itextRef, array $translations): ?string
+    {
+        // Parse da referência itext
+        // Formato: jr:itext('/PEIXES_IGARAPERIACHO_01SET25/uc:label')
+        if (preg_match("/jr:itext\('([^']+)'\)/", $itextRef, $matches)) {
+            $itextId = $matches[1];
+            return $translations[$itextId] ?? null;
+        }
+        
+        // Formato: jr:itext(variable) - mais complexo, não implementado ainda
         return null;
     }
 }
