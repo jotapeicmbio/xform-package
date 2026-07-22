@@ -47,6 +47,36 @@ trait SurveyInstance
     }
 
     /**
+     * Verifica se existe um campo de data da coleta.
+     */
+    public function hasCollectionDate(): bool
+    {
+        return $this->getCollectionDateNodeset() !== null;
+    }
+
+    /**
+     * Retorna o nodeset do campo de data da coleta.
+     */
+    public function getCollectionDate(): ?string
+    {
+        return $this->getCollectionDateNodeset();
+    }
+
+    /**
+     * Localiza o nodeset do campo de data da coleta.
+     */
+    private function getCollectionDateNodeset(): ?string
+    {
+        $nodes = $this->xpath()->query("//*[local-name()='bind' and (@type='date' or @type='dateTime') and (substring(@nodeset, string-length(@nodeset) - string-length('/data') + 1)='/data' or substring(@nodeset, string-length(@nodeset) - string-length('/coleta_data') + 1)='/coleta_data')]/@nodeset");
+        if ($nodes === false || $nodes->length === 0) {
+            return null;
+        }
+
+        $nodeset = (string) $nodes->item(0)?->nodeValue;
+        return $nodeset !== '' ? $nodeset : null;
+    }
+
+    /**
      * Retorna array de nodesets dos elementos bind no XForm
      * 
      * @return array<string> Array de strings com os nodesets

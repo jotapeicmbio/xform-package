@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml">
+  <h:head>
+    <h:title>Xform Campo Data Raiz</h:title>
+    <model>
+      <instance>
+        <xfrm_campo_data_raiz id="xfrm_campo_data_raiz" version="20260722">
+          <data/>
+        </xfrm_campo_data_raiz>
+      </instance>
+      <bind nodeset="/xfrm_campo_data_raiz/data" type="date"/>
+    </model>
+  </h:head>
+  <h:body>
+    <input ref="/xfrm_campo_data_raiz/data"/>
+  </h:body>
+</h:html>

@@ -127,4 +127,28 @@ class XformSurveyInstanceTest extends TestCase
         $this->assertIsString($xform);
         $this->assertEquals($expected, (new Xform($xform))->getSimpleInfoSurvey());
     }
+
+    #[Test]
+    public function shouldReturnCollectionDateFromGroupXform(): void
+    {
+        $xform = file_get_contents(__DIR__ . '/../xforms/xform_campo_data_grupo');
+        $this->assertIsString($xform);
+        $this->assertTrue((new Xform($xform))->hasCollectionDate());
+        $this->assertEquals(
+            '/xform_campo_data_grupo/grupo/data',
+            (new Xform($xform))->getCollectionDate()
+        );
+    }
+
+    #[Test]
+    public function shouldReturnCollectionDateFromRootXform(): void
+    {
+        $xform = file_get_contents(__DIR__ . '/../xforms/xfrm_campo_data_raiz');
+        $this->assertIsString($xform);
+        $this->assertTrue((new Xform($xform))->hasCollectionDate());
+        $this->assertEquals(
+            '/xfrm_campo_data_raiz/data',
+            (new Xform($xform))->getCollectionDate()
+        );
+    }
 }

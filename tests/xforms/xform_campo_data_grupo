@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml">
+  <h:head>
+    <model>
+      <instance>
+        <xform_campo_data_grupo id="xform_campo_data_grupo" version="20260722">
+          <grupo>
+            <data/>
+          </grupo>
+        </xform_campo_data_grupo>
+      </instance>
+      <bind nodeset="/xform_campo_data_grupo/grupo/data" type="date"/>
+    </model>
+  </h:head>
+  <h:body>
+    <group ref="/xform_campo_data_grupo/grupo">
+      <input ref="/xform_campo_data_grupo/grupo/data"/>
+    </group>
+  </h:body>
+</h:html>
