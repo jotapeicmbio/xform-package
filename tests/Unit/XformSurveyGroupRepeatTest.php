@@ -11,7 +11,7 @@ class XformSurveyGroupRepeatTest extends TestCase
      #[Test]
     public function shouldReturnFalseWhenXformNotHasGroupRepeat(): void
     {
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_geopoint');
+        $xform = file_get_contents(__DIR__ . '/../xforms/xform_geopoint');
         $this->assertIsString($xform);
         $this->assertFalse((new Xform($xform))->hasGroupRepeat());
     }
@@ -19,7 +19,7 @@ class XformSurveyGroupRepeatTest extends TestCase
     #[Test]
     public function shouldReturnTrueWhenXformHasGroupRepeat(): void
     {
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_simple');
+        $xform = file_get_contents(__DIR__ . '/../xforms/xform_group_repeat_simple');
         $this->assertIsString($xform);
         $this->assertTrue((new Xform($xform))->hasGroupRepeat());
     }
@@ -31,7 +31,7 @@ class XformSurveyGroupRepeatTest extends TestCase
             '/xlsform_group_repeat_simple/first_group',
         ];
 
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_simple');
+        $xform = file_get_contents(__DIR__ . '/../xforms/xform_group_repeat_simple');
         $this->assertIsString($xform);
         $this->assertEquals($expected, (new Xform($xform))->getGroupRepeats());
     }
@@ -45,7 +45,7 @@ class XformSurveyGroupRepeatTest extends TestCase
             '/xlsform_group_repeat_nested/first_group/second_group/third_group',
         ];
 
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_nested');
+        $xform = file_get_contents(__DIR__ . '/../xforms/xform_group_repeat_nested');
         $this->assertIsString($xform);
         $this->assertEquals($expected, (new Xform($xform))->getGroupRepeats());
     }
@@ -58,7 +58,7 @@ class XformSurveyGroupRepeatTest extends TestCase
         ];
 
         
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_simple');
+        $xform = file_get_contents(__DIR__ . '/../xforms/xform_group_repeat_simple');
         $this->assertIsString($xform);
         $this->assertEquals($expected, (new Xform($xform, 'group'))->getGroupRepeatsWithUuid());
     }
@@ -73,7 +73,7 @@ class XformSurveyGroupRepeatTest extends TestCase
             '/xlsform_group_repeat_nested/first_group/second_group/third_group/thrid_uuid',
         ];
 
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_nested');
+        $xform = file_get_contents(__DIR__ . '/../xforms/xform_group_repeat_nested');
         $this->assertIsString($xform);
         $this->assertEquals($expected, (new Xform($xform, 'group'))->getGroupRepeatsWithUuid());
     }
@@ -90,7 +90,7 @@ class XformSurveyGroupRepeatTest extends TestCase
             '/xlsform_group_repeat_nested/first_group/second_group/third_group/thrid_name',
         ];
 
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_nested');
+        $xform = file_get_contents(__DIR__ . '/../xforms/xform_group_repeat_nested');
         $this->assertIsString($xform);
         $this->assertEquals($expected, (new Xform($xform))->getNamesXform());
     }

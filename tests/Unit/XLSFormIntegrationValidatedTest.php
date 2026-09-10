@@ -23,7 +23,7 @@ class XLSFormIntegrationValidatedTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->validatedXmlPath = '/var/www/html/tests/xforms/survey_biodiversidade_completo.xml';
+        $this->validatedXmlPath = __DIR__ . '/../xforms/survey_biodiversidade_completo.xml';
         $this->validatedXmlContent = file_get_contents($this->validatedXmlPath);
     }
     

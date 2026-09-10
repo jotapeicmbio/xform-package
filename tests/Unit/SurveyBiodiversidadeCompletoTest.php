@@ -20,7 +20,7 @@ class SurveyBiodiversidadeCompletoTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->validatedXmlContent = file_get_contents('/var/www/html/tests/xforms/survey_biodiversidade_completo.xml');
+        $this->validatedXmlContent = file_get_contents(__DIR__ . '/../xforms/survey_biodiversidade_completo.xml');
     }
 
     public function testCompleteExpectedArrayStructure(): void

@@ -11,7 +11,7 @@ class XformSurveyInstanceTest extends TestCase
     #[Test]
     public function shouldReturnTrueWhenXformHasId(): void
     {
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_medias');
+        $xform = file_get_contents(__DIR__ . '/../xforms/xform_medias');
         $this->assertIsString($xform);
         $this->assertTrue((new Xform($xform))->hasId());
     }
@@ -19,7 +19,7 @@ class XformSurveyInstanceTest extends TestCase
     #[Test]
     public function shouldReturnStringWhenXformHasId(): void
     {
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_medias');
+        $xform = file_get_contents(__DIR__ . '/../xforms/xform_medias');
         $this->assertIsString($xform);
         $this->assertEquals('xform_medias', (new Xform($xform))->getId());
     }
@@ -27,7 +27,7 @@ class XformSurveyInstanceTest extends TestCase
     #[Test]
     public function shouldReturnTrueWhenXformHasVersion(): void
     {
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_medias');
+        $xform = file_get_contents(__DIR__ . '/../xforms/xform_medias');
         $this->assertIsString($xform);
         $this->assertTrue((new Xform($xform))->hasVersion());
     }
@@ -35,7 +35,7 @@ class XformSurveyInstanceTest extends TestCase
     #[Test]
     public function shouldReturnStringWhenXformHasVersion(): void
     {
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_medias');
+        $xform = file_get_contents(__DIR__ . '/../xforms/xform_medias');
         $this->assertIsString($xform);
         $this->assertEquals('20250930', (new Xform($xform))->getVersion());
     }
@@ -53,7 +53,7 @@ class XformSurveyInstanceTest extends TestCase
             '/xlsform_group_repeat_nested/meta/instanceID',
         ];
 
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_nested');
+        $xform = file_get_contents(__DIR__ . '/../xforms/xform_group_repeat_nested');
         $this->assertIsString($xform);
         $this->assertEquals($expected, (new Xform($xform))->getNodeset());
     }
@@ -71,7 +71,7 @@ class XformSurveyInstanceTest extends TestCase
             'meta/instanceID',
         ];
 
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_nested');
+        $xform = file_get_contents(__DIR__ . '/../xforms/xform_group_repeat_nested');
         $this->assertIsString($xform);
         $this->assertEquals($expected, (new Xform($xform))->shortGetNodeset());
     }
@@ -97,7 +97,7 @@ class XformSurveyInstanceTest extends TestCase
         ];
 
         
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_geopoint');
+        $xform = file_get_contents(__DIR__ . '/../xforms/xform_geopoint');
         $this->assertIsString($xform);
         $this->assertEquals($expected, (new Xform($xform))->getSimpleInfoSurvey());
     }
@@ -123,7 +123,7 @@ class XformSurveyInstanceTest extends TestCase
         ];
 
         
-        $xform = file_get_contents('/var/www/html/tests/xforms/xform_group_repeat_nested');
+        $xform = file_get_contents(__DIR__ . '/../xforms/xform_group_repeat_nested');
         $this->assertIsString($xform);
         $this->assertEquals($expected, (new Xform($xform))->getSimpleInfoSurvey());
     }
