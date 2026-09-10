@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Icmbio\Xform\Concerns;
+namespace Icmbio\Xform\Concerns\Survey;
 
-trait SurveyGroup
+trait Group
 {
     /**
      * Verifica se o formulário possui grupos repetitivos

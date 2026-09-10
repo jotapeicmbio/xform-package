@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Icmbio\Xform\Concerns;
+namespace Icmbio\Xform\Concerns\Survey;
 
-trait SurveyGeo
+trait Geo
 {
     /**
      * Verifica se o formulário possui campos geopoint

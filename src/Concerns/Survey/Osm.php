@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Icmbio\Xform\Concerns;
+namespace Icmbio\Xform\Concerns\Survey;
 
 // TODO - implementar testes
-trait SurveyOsm
+trait Osm
 {
     /**
      * Verifica se o formulário possui campos OpenStreetMap

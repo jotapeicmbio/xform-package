@@ -19,11 +19,11 @@ namespace Icmbio\Xform;
 class Xform
 {
     use Concerns\XmlDocument,
-        Concerns\SurveyInstance,
-        Concerns\SurveyGeo,
-        Concerns\SurveyAttachment,
-        Concerns\SurveyGroup,
-        Concerns\SurveyGroupRepeat;
+        Concerns\Survey\Instance,
+        Concerns\Survey\Geo,
+        Concerns\Survey\Attachment,
+        Concerns\Survey\Group,
+        Concerns\Survey\GroupRepeat;
 
     protected ?string $group_repeat = null;
     protected ?string $group_repeat_plural = null;

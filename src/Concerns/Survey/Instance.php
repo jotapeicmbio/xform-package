@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Icmbio\Xform\Concerns;
+namespace Icmbio\Xform\Concerns\Survey;
 
-trait SurveyInstance
+trait Instance
 {
     /**
      * Verifica se o formúlário possui ID definido

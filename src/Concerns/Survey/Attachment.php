@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Icmbio\Xform\Concerns;
+namespace Icmbio\Xform\Concerns\Survey;
 
-trait SurveyAttachment
+trait Attachment
 {
     /**
      * Verifica se o formulário possui campos de attachment
