@@ -24,6 +24,7 @@ class Xform
     use Concerns\SurveyInstance,
         Concerns\SurveyGeo,
         Concerns\SurveyAttachment,
+        Concerns\SurveyGroup,
         Concerns\SurveyGroupRepeat;
 
     private DOMDocument $domDocument;
@@ -98,4 +99,3 @@ class Xform
         throw new \BadMethodCallException("Method {$name} does not exist");
     }
 }
-
