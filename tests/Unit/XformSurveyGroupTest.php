@@ -63,6 +63,22 @@ class XformSurveyGroupTest extends TestCase
         );
     }
 
+    #[Test]
+    public function shouldReturnItemsFromGroupNodeset(): void
+    {
+        $xform = new Xform($this->loadXform('xform_medias'));
+
+        $this->assertSame(
+            [
+                '/xform_medias/medias/name_image',
+                '/xform_medias/medias/name_audio',
+                '/xform_medias/medias/name_video',
+                '/xform_medias/medias/name_file',
+            ],
+            $xform->getGroupItems('/xform_medias/medias')
+        );
+    }
+
     private function loadXform(string $filename): string
     {
         $content = file_get_contents(__DIR__ . '/../xforms/' . $filename);

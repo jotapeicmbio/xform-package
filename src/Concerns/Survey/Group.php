@@ -50,4 +50,24 @@ trait Group
             iterator_to_array($nodes)
         );
     }
+
+    /**
+     * Retorna os nodesets dos itens de um grupo.
+     *
+     * @return array<int, string>
+     */
+    public function getGroupItems(string $nodeset): array
+    {
+        $nodes = $this->xpath()->query(
+            "//x:bind[contains(@nodeset, '{$nodeset}')]/@nodeset"
+        );
+        if ($nodes === false) {
+            return [];
+        }
+
+        return array_map(
+            static fn($node): string => (string) $node->nodeValue,
+            iterator_to_array($nodes)
+        );
+    }
 }
