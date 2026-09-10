@@ -2,23 +2,25 @@
 
 declare(strict_types=1);
 
-namespace Icmbio\Xform;
+namespace Icmbio\Xform\Concerns;
 
 use DOMDocument;
 use DOMXPath;
 
 /**
- * Base comum para classes que trabalham com documentos XML.
- *
- * A classe concentra somente a infraestrutura do documento. Regras
- * específicas de XForm ou de uma instância devem permanecer nas classes
- * especializadas.
+ * Compartilha a infraestrutura básica para classes que trabalham com XML.
  */
-class XmlDocument
+trait XmlDocument
 {
     protected DOMDocument $domDocument;
 
-    public function __construct(string $content)
+    /**
+     * Inicializa o DOM a partir do conteúdo XML.
+     *
+     * Este método também pode ser chamado por classes que possuem um
+     * construtor próprio, como Xform.
+     */
+    protected function boot(string $content): void
     {
         $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
 
@@ -55,9 +57,6 @@ class XmlDocument
 
     /**
      * Cria um XPath associado ao documento.
-     *
-     * Os namespaces conhecidos pelos XForms atuais são registrados aqui para
-     * que as classes especializadas possam reutilizar a mesma infraestrutura.
      */
     protected function xpath(): DOMXPath
     {
@@ -80,9 +79,6 @@ class XmlDocument
 
     /**
      * Resolve chamadas no formato shortNomeMetodo().
-     *
-     * O método mantém o comportamento usado atualmente por Xform, permitindo
-     * que a API existente seja preservada quando a classe-base for adotada.
      *
      * @param string $name Nome do método chamado
      * @param array<int, mixed> $arguments Argumentos recebidos

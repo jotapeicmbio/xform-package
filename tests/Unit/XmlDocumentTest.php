@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Icmbio\Xform\Tests\Unit;
 
-use Icmbio\Xform\XmlDocument;
+use Icmbio\Xform\Concerns\XmlDocument;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -13,15 +13,29 @@ class XmlDocumentTest extends TestCase
     #[Test]
     public function shouldCreateDocumentFromXmlWithBom(): void
     {
-        $document = XmlDocument::make("\xEF\xBB\xBF<root><item/></root>");
+        $document = new class ("\xEF\xBB\xBF<root><item/></root>") {
+            use XmlDocument;
 
-        $this->assertInstanceOf(XmlDocument::class, $document);
+            public function __construct(string $content)
+            {
+                $this->boot($content);
+            }
+        };
+
+        $this->assertContains(XmlDocument::class, class_uses($document));
     }
 
     #[Test]
     public function shouldRegisterNamespacesForXpathQueries(): void
     {
-        $document = new class ('<h:html xmlns:h="http://www.w3.org/1999/xhtml"><h:body/></h:html>') extends XmlDocument {
+        $document = new class ('<h:html xmlns:h="http://www.w3.org/1999/xhtml"><h:body/></h:html>') {
+            use XmlDocument;
+
+            public function __construct(string $content)
+            {
+                $this->boot($content);
+            }
+
             public function hasBody(): bool
             {
                 return $this->xpath()->evaluate('boolean(//h:body)') === true;
@@ -34,7 +48,14 @@ class XmlDocumentTest extends TestCase
     #[Test]
     public function shouldAbbreviateXpath(): void
     {
-        $document = new XmlDocument('<root/>');
+        $document = new class ('<root/>') {
+            use XmlDocument;
+
+            public function __construct(string $content)
+            {
+                $this->boot($content);
+            }
+        };
 
         $this->assertSame('group/field', $document->abbreviatedXpath('/survey/group/field'));
         $this->assertSame('field', $document->abbreviatedXpath('survey/field'));
@@ -44,7 +65,14 @@ class XmlDocumentTest extends TestCase
     #[Test]
     public function shouldResolveShortMethodsFromChildClasses(): void
     {
-        $document = new class ('<root/>') extends XmlDocument {
+        $document = new class ('<root/>') {
+            use XmlDocument;
+
+            public function __construct(string $content)
+            {
+                $this->boot($content);
+            }
+
             /**
              * @return array<string>
              */
