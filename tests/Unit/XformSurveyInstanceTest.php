@@ -2,7 +2,7 @@
 
 namespace Icmbio\Xform\Tests\Unit;
 
-use Icmbio\Xform\Xform;
+use Icmbio\Xform\Instance;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -13,7 +13,7 @@ class XformSurveyInstanceTest extends TestCase
     {
         $xform = file_get_contents(__DIR__ . '/../xforms/xform_medias');
         $this->assertIsString($xform);
-        $this->assertTrue((new Xform($xform))->hasId());
+        $this->assertTrue((new Instance($xform))->hasId());
     }
 
     #[Test]
@@ -21,7 +21,7 @@ class XformSurveyInstanceTest extends TestCase
     {
         $xform = file_get_contents(__DIR__ . '/../xforms/xform_medias');
         $this->assertIsString($xform);
-        $this->assertEquals('xform_medias', (new Xform($xform))->getId());
+        $this->assertEquals('xform_medias', (new Instance($xform))->getId());
     }
 
     #[Test]
@@ -29,7 +29,7 @@ class XformSurveyInstanceTest extends TestCase
     {
         $xform = file_get_contents(__DIR__ . '/../xforms/xform_medias');
         $this->assertIsString($xform);
-        $this->assertTrue((new Xform($xform))->hasVersion());
+        $this->assertTrue((new Instance($xform))->hasVersion());
     }
 
     #[Test]
@@ -37,7 +37,7 @@ class XformSurveyInstanceTest extends TestCase
     {
         $xform = file_get_contents(__DIR__ . '/../xforms/xform_medias');
         $this->assertIsString($xform);
-        $this->assertEquals('20250930', (new Xform($xform))->getVersion());
+        $this->assertEquals('20250930', (new Instance($xform))->getVersion());
     }
 
     #[Test]
@@ -55,7 +55,7 @@ class XformSurveyInstanceTest extends TestCase
 
         $xform = file_get_contents(__DIR__ . '/../xforms/xform_group_repeat_nested');
         $this->assertIsString($xform);
-        $this->assertEquals($expected, (new Xform($xform))->getNodeset());
+        $this->assertEquals($expected, (new Instance($xform))->getNodeset());
     }
     
     #[Test]
@@ -73,7 +73,7 @@ class XformSurveyInstanceTest extends TestCase
 
         $xform = file_get_contents(__DIR__ . '/../xforms/xform_group_repeat_nested');
         $this->assertIsString($xform);
-        $this->assertEquals($expected, (new Xform($xform))->shortGetNodeset());
+        $this->assertEquals($expected, (new Instance($xform))->shortGetNodeset());
     }
 
     #[Test]
@@ -99,7 +99,7 @@ class XformSurveyInstanceTest extends TestCase
         
         $xform = file_get_contents(__DIR__ . '/../xforms/xform_geopoint');
         $this->assertIsString($xform);
-        $this->assertEquals($expected, (new Xform($xform))->getSimpleInfoSurvey());
+        $this->assertEquals($expected, (new Instance($xform))->getSimpleInfoSurvey());
     }
 
     #[Test]
@@ -125,7 +125,7 @@ class XformSurveyInstanceTest extends TestCase
         
         $xform = file_get_contents(__DIR__ . '/../xforms/xform_group_repeat_nested');
         $this->assertIsString($xform);
-        $this->assertEquals($expected, (new Xform($xform))->getSimpleInfoSurvey());
+        $this->assertEquals($expected, (new Instance($xform))->getSimpleInfoSurvey());
     }
 
     #[Test]
@@ -133,10 +133,10 @@ class XformSurveyInstanceTest extends TestCase
     {
         $xform = file_get_contents(__DIR__ . '/../xforms/xform_campo_data_grupo');
         $this->assertIsString($xform);
-        $this->assertTrue((new Xform($xform))->hasCollectionDate());
+        $this->assertTrue((new Instance($xform))->hasCollectionDate());
         $this->assertEquals(
             '/xform_campo_data_grupo/grupo/data',
-            (new Xform($xform))->getCollectionDate()
+            (new Instance($xform))->getCollectionDate()
         );
     }
 
@@ -145,10 +145,10 @@ class XformSurveyInstanceTest extends TestCase
     {
         $xform = file_get_contents(__DIR__ . '/../xforms/xfrm_campo_data_raiz');
         $this->assertIsString($xform);
-        $this->assertTrue((new Xform($xform))->hasCollectionDate());
+        $this->assertTrue((new Instance($xform))->hasCollectionDate());
         $this->assertEquals(
             '/xfrm_campo_data_raiz/data',
-            (new Xform($xform))->getCollectionDate()
+            (new Instance($xform))->getCollectionDate()
         );
     }
 }

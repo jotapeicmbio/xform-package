@@ -19,7 +19,7 @@ namespace Icmbio\Xform;
 class Xform
 {
     use Concerns\XmlDocument,
-        Concerns\Survey\Instance,
+        Concerns\Instance\Instance,
         Concerns\Survey\Geo,
         Concerns\Survey\Attachment,
         Concerns\Survey\Group,

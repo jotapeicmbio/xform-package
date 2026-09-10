@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Icmbio\Xform\Concerns\Survey;
+namespace Icmbio\Xform\Concerns\Instance;
 
 trait Instance
 {
